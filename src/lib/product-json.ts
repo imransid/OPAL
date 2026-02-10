@@ -27,6 +27,7 @@ export interface ProductJsonInput {
   createdAt?: string;
   updatedAt?: string;
   status?: string;
+  resource?: string;
   [key: string]: unknown;
 }
 
@@ -72,5 +73,6 @@ export function jsonToProduct(json: ProductJsonInput): Partial<Omit<Product, 'id
     specifications: Object.keys(specs).length > 0 ? specs : undefined,
     delivery: json.delivery,
     status: json.status,
+    resource: json.resource,
   };
 }

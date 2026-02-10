@@ -255,3 +255,9 @@ export async function getAllOrders(): Promise<Order[]> {
     } as Order;
   });
 }
+
+export async function deleteOrder(orderId: string): Promise<void> {
+  const db = getDb();
+  if (!db) throw new Error('Firebase not configured');
+  await deleteDoc(doc(db, ORDERS, orderId));
+}

@@ -11,6 +11,7 @@ const defaultProduct: Omit<Product, 'id'> = {
   stock: true,
   colors: [],
   images: [],
+  resource: '',
 };
 
 export default function AdminProducts() {
@@ -19,6 +20,7 @@ export default function AdminProducts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [editing, setEditing] = useState<Product | null>(null);
+  const [viewProduct, setViewProduct] = useState<Product | null>(null);
   const [form, setForm] = useState<Omit<Product, 'id'>>(defaultProduct);
   const [jsonInput, setJsonInput] = useState('');
   const [showImport, setShowImport] = useState(false);
@@ -101,6 +103,7 @@ export default function AdminProducts() {
       brand: p.brand,
       model: p.model,
       slug: p.slug,
+      resource: p.resource,
       delivery: p.delivery,
       status: p.status,
       categoryId: p.categoryId,
@@ -263,6 +266,10 @@ export default function AdminProducts() {
                   <input type="text" className="form-control" value={form.slug ?? ''} onChange={(e) => update('slug', e.target.value)} placeholder="baseus-enerfill-fm11" />
                 </div>
                 <div className="mb-2">
+                  <label className="form-label">Resource</label>
+                  <input type="text" className="form-control" value={form.resource ?? ''} onChange={(e) => update('resource', e.target.value)} placeholder="e.g. link or resource name" />
+                </div>
+                <div className="mb-2">
                   <label className="form-label">Short description</label>
                   <textarea className="form-control" rows={2} value={form.shortDescription ?? form.description ?? ''} onChange={(e) => { update('shortDescription', e.target.value); update('description', e.target.value); }} placeholder="Brief product summary" />
                 </div>
@@ -374,6 +381,7 @@ export default function AdminProducts() {
                     <tr>
                       <th>Image</th>
                       <th>Title</th>
+                      <th>Model</th>
                       <th>Category</th>
                       <th>Price</th>
                       <th>Stock</th>
@@ -382,7 +390,7 @@ export default function AdminProducts() {
                   </thead>
                   <tbody>
                     {list.length === 0 ? (
-                      <tr><td colSpan={6} className="text-center text-body-secondary">No products. Add one or import from JSON.</td></tr>
+                      <tr><td colSpan={7} className="text-center text-body-secondary">No products. Add one or import from JSON.</td></tr>
                     ) : (
                       list.map((p) => (
                         <tr key={p.id}>
@@ -390,6 +398,7 @@ export default function AdminProducts() {
                             {p.thumb_src ? <img src={p.thumb_src} alt="" width={40} height={40} style={{ objectFit: 'cover' }} className="rounded" /> : '—'}
                           </td>
                           <td>{p.title}</td>
+                          <td>{p.model ?? '—'}</td>
                           <td>{getCategoryTitle(p.categoryId)}</td>
                           <td>{p.currency ?? ''}{p.price}{p.discountPrice != null ? ` → ${p.discountPrice}` : ''}</td>
                           <td>
@@ -407,7 +416,7 @@ export default function AdminProducts() {
                             </select>
                           </td>
                           <td>
-                            <a href={`/product/?id=${p.id}`} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-primary me-1">View</a>
+                            <button type="button" className="btn btn-sm btn-outline-primary me-1" onClick={() => setViewProduct(p)}>View</button>
                             <button type="button" className="btn btn-sm btn-outline-secondary me-1" onClick={() => openEdit(p)}>Edit</button>
                             <button type="button" className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(p.id)}>Delete</button>
                           </td>
@@ -421,6 +430,58 @@ export default function AdminProducts() {
           </div>
         </div>
       </div>
+
+      {/* View product modal */}
+      {viewProduct && (
+        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }} onClick={() => setViewProduct(null)}>
+          <div className="modal-dialog modal-dialog-centered modal-lg" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Product: {viewProduct.title}</h5>
+                <button type="button" className="btn-close" onClick={() => setViewProduct(null)} aria-label="Close" />
+              </div>
+              <div className="modal-body">
+                <div className="row g-3">
+                  {viewProduct.thumb_src && (
+                    <div className="col-12 col-md-4">
+                      <img src={viewProduct.thumb_src} alt="" className="img-fluid rounded" style={{ maxHeight: 200, objectFit: 'cover' }} />
+                    </div>
+                  )}
+                  <div className="col">
+                    <dl className="row mb-0 small">
+                      <dt className="col-sm-3">Model</dt>
+                      <dd className="col-sm-9">{viewProduct.model ?? '—'}</dd>
+                      <dt className="col-sm-3">Brand</dt>
+                      <dd className="col-sm-9">{viewProduct.brand ?? '—'}</dd>
+                      <dt className="col-sm-3">Category</dt>
+                      <dd className="col-sm-9">{getCategoryTitle(viewProduct.categoryId)}</dd>
+                      <dt className="col-sm-3">Price</dt>
+                      <dd className="col-sm-9">{viewProduct.currency ?? ''}{viewProduct.price}{viewProduct.discountPrice != null ? ` (discount: ${viewProduct.currency ?? ''}${viewProduct.discountPrice})` : ''}</dd>
+                      <dt className="col-sm-3">Stock</dt>
+                      <dd className="col-sm-9">{viewProduct.stock !== false ? 'In stock' : 'Out of stock'}</dd>
+                      <dt className="col-sm-3">Resource</dt>
+                      <dd className="col-sm-9">{viewProduct.resource ?? '—'}</dd>
+                      <dt className="col-sm-3">Slug</dt>
+                      <dd className="col-sm-9">{viewProduct.slug ?? '—'}</dd>
+                      {viewProduct.shortDescription != null && viewProduct.shortDescription !== '' && (
+                        <>
+                          <dt className="col-sm-3">Description</dt>
+                          <dd className="col-sm-9">{viewProduct.shortDescription}</dd>
+                        </>
+                      )}
+                    </dl>
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <a href={`/product/?id=${viewProduct.id}`} target="_blank" rel="noopener noreferrer" className="btn btn-outline-primary">Open on site</a>
+                <button type="button" className="btn btn-secondary" onClick={() => setViewProduct(null)}>Close</button>
+                <button type="button" className="btn btn-dark" onClick={() => { setViewProduct(null); openEdit(viewProduct); }}>Edit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

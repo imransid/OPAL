@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getAllOrders, updateOrderStatus } from '../../lib/firestore';
+import { getAllOrders, updateOrderStatus, deleteOrder } from '../../lib/firestore';
 import type { Order, OrderStatus } from '../../lib/types';
 
 const STATUS_OPTIONS: OrderStatus[] = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
@@ -23,6 +23,16 @@ export default function AdminOrders() {
       setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status } : o)));
     } catch {
       alert('Failed to update status');
+    }
+  };
+
+  const handleDelete = async (orderId: string) => {
+    if (!confirm('Delete this order? This cannot be undone.')) return;
+    try {
+      await deleteOrder(orderId);
+      setOrders((prev) => prev.filter((o) => o.id !== orderId));
+    } catch {
+      alert('Failed to delete order');
     }
   };
 
@@ -76,6 +86,7 @@ export default function AdminOrders() {
                     <th>Total</th>
                     <th>Status</th>
                     <th>Date</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -96,6 +107,16 @@ export default function AdminOrders() {
                         </select>
                       </td>
                       <td>{new Date(o.createdAt).toLocaleDateString()}</td>
+                      <td>
+                        <button
+                          type="button"
+                          className="btn btn-outline-danger btn-sm"
+                          onClick={() => handleDelete(o.id)}
+                          title="Delete order"
+                        >
+                          Delete
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

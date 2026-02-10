@@ -56,6 +56,8 @@ export interface Product {
   brand?: string;
   model?: string;
   slug?: string;
+  /** Admin-only: not displayed on storefront */
+  resource?: string;
   delivery?: ProductDelivery;
   status?: string;
 }
