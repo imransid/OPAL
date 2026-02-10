@@ -214,7 +214,14 @@ export default function OrderTrackContent() {
                       )}
                       <div className="flex-grow-1">
                         <span className="fw-semibold">{item.title}</span>
-                        <span className="text-body-secondary small ms-2">
+                        {(item.color || item.size) && (
+                          <span className="text-body-secondary small d-block">
+                            {item.color && <>Colour: {item.color}</>}
+                            {item.color && item.size && ' · '}
+                            {item.size && <>Size: {item.size}</>}
+                          </span>
+                        )}
+                        <span className="text-body-secondary small ms-0 d-block">
                           {item.quantity} × {order.currency}{item.price.toLocaleString()}
                         </span>
                       </div>

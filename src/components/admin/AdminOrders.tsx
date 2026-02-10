@@ -7,6 +7,7 @@ const STATUS_OPTIONS: OrderStatus[] = ['pending', 'confirmed', 'shipped', 'deliv
 export default function AdminOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [viewOrder, setViewOrder] = useState<Order | null>(null);
 
   const load = () => {
     setLoading(true);
@@ -77,51 +78,119 @@ export default function AdminOrders() {
           {orders.length === 0 ? (
             <p className="text-body-secondary mb-0">No orders yet.</p>
           ) : (
-            <div className="table-responsive">
-              <table className="table table-sm">
-                <thead>
-                  <tr>
-                    <th>Order #</th>
-                    <th>Email</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.map((o) => (
-                    <tr key={o.id}>
-                      <td>{o.orderNumber}</td>
-                      <td>{o.contact.email}</td>
-                      <td>{o.currency}{o.total.toLocaleString()}</td>
-                      <td>
-                        <select
-                          className="form-select form-select-sm"
-                          value={o.status}
-                          onChange={(e) => handleStatusChange(o.id, e.target.value as OrderStatus)}
-                        >
-                          {STATUS_OPTIONS.map((s) => (
-                            <option key={s} value={s}>{s}</option>
-                          ))}
-                        </select>
-                      </td>
-                      <td>{new Date(o.createdAt).toLocaleDateString()}</td>
-                      <td>
-                        <button
-                          type="button"
-                          className="btn btn-outline-danger btn-sm"
-                          onClick={() => handleDelete(o.id)}
-                          title="Delete order"
-                        >
-                          Delete
-                        </button>
-                      </td>
+            <>
+              <div className="table-responsive">
+                <table className="table table-sm">
+                  <thead>
+                    <tr>
+                      <th>Order #</th>
+                      <th>Email</th>
+                      <th>Total</th>
+                      <th>Status</th>
+                      <th>Date</th>
+                      <th>Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {orders.map((o) => (
+                      <tr key={o.id}>
+                        <td>{o.orderNumber}</td>
+                        <td>{o.contact.email}</td>
+                        <td>{o.currency}{o.total.toLocaleString()}</td>
+                        <td>
+                          <select
+                            className="form-select form-select-sm"
+                            value={o.status}
+                            onChange={(e) => handleStatusChange(o.id, e.target.value as OrderStatus)}
+                          >
+                            {STATUS_OPTIONS.map((s) => (
+                              <option key={s} value={s}>{s}</option>
+                            ))}
+                          </select>
+                        </td>
+                        <td>{new Date(o.createdAt).toLocaleDateString()}</td>
+                        <td>
+                          <button
+                            type="button"
+                            className="btn btn-outline-primary btn-sm me-1"
+                            onClick={() => setViewOrder(o)}
+                            title="View details"
+                          >
+                            View
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-outline-danger btn-sm"
+                            onClick={() => handleDelete(o.id)}
+                            title="Delete order"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {viewOrder && (
+                <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }} onClick={() => setViewOrder(null)}>
+                  <div className="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable" onClick={(e) => e.stopPropagation()}>
+                    <div className="modal-content">
+                      <div className="modal-header">
+                        <h5 className="modal-title">Order {viewOrder.orderNumber}</h5>
+                        <button type="button" className="btn-close" onClick={() => setViewOrder(null)} aria-label="Close" />
+                      </div>
+                      <div className="modal-body">
+                        <div className="mb-3">
+                          <span className="badge bg-dark me-2">{viewOrder.status}</span>
+                          <span className="text-body-secondary small">{new Date(viewOrder.createdAt).toLocaleString()}</span>
+                        </div>
+                        <h6 className="mt-3 mb-2">Items</h6>
+                        <table className="table table-sm table-bordered">
+                          <thead>
+                            <tr>
+                              <th>Product</th>
+                              <th>Colour</th>
+                              <th>Size</th>
+                              <th>Qty</th>
+                              <th>Price</th>
+                              <th>Subtotal</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {viewOrder.items.map((item, i) => (
+                              <tr key={i}>
+                                <td>{item.title}</td>
+                                <td>{item.color ?? '—'}</td>
+                                <td>{item.size ?? '—'}</td>
+                                <td>{item.quantity}</td>
+                                <td>{viewOrder.currency}{item.price.toLocaleString()}</td>
+                                <td>{viewOrder.currency}{item.subtotal.toLocaleString()}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                        <div className="d-flex justify-content-between mb-2"><span className="text-body-secondary">Subtotal</span><span>{viewOrder.currency}{viewOrder.subtotal.toLocaleString()}</span></div>
+                        <div className="d-flex justify-content-between mb-2"><span className="text-body-secondary">Shipping</span><span>{viewOrder.currency}{viewOrder.shippingCost.toLocaleString()}</span></div>
+                        <div className="d-flex justify-content-between fw-bold"><span>Total</span><span>{viewOrder.currency}{viewOrder.total.toLocaleString()}</span></div>
+                        <h6 className="mt-4 mb-2">Contact</h6>
+                        <p className="mb-1 small">{viewOrder.contact.email} · {viewOrder.contact.phone}</p>
+                        <h6 className="mt-3 mb-2">Shipping address</h6>
+                        <p className="mb-0 small">
+                          {viewOrder.shipping.address}<br />
+                          {[viewOrder.shipping.city, viewOrder.shipping.state, viewOrder.shipping.postalCode].filter(Boolean).join(', ')}
+                        </p>
+                        <p className="mt-2 mb-0 small text-body-secondary">Payment: {viewOrder.paymentMethod === 'card' ? 'Card' : 'Cash on delivery'}</p>
+                      </div>
+                      <div className="modal-footer">
+                        <button type="button" className="btn btn-secondary" onClick={() => setViewOrder(null)}>Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

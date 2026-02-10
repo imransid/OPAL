@@ -70,6 +70,8 @@ export default function HomeFirebaseSection() {
                     thumb_alt={product.thumb_alt || product.title}
                     color={product.color}
                     colors={product.colors}
+                    size={product.size}
+                    sizes={product.sizes}
                     title={product.title}
                     description={product.description}
                     price={product.price}

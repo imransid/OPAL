@@ -3,6 +3,24 @@ const CART_KEY = 'opal_cart';
 export interface CartItem {
   id: string;
   qty: number;
+  color?: string;
+  size?: string;
+}
+
+export interface AddToCartOptions {
+  color?: string;
+  size?: string;
+}
+
+function norm(s: string | undefined): string {
+  return (s ?? '').trim();
+}
+
+function itemMatch(a: CartItem, productId: string, options?: AddToCartOptions): boolean {
+  if (a.id !== productId) return false;
+  if (norm(a.color) !== norm(options?.color ?? '')) return false;
+  if (norm(a.size) !== norm(options?.size ?? '')) return false;
+  return true;
 }
 
 function getCartRaw(): CartItem[] {
@@ -30,32 +48,36 @@ export function getCartCount(): number {
   return getCartRaw().reduce((sum, i) => sum + (i.qty || 1), 0);
 }
 
-export function addToCart(productId: string, qty = 1): CartItem[] {
+export function addToCart(productId: string, qty = 1, options?: AddToCartOptions): CartItem[] {
   const cart = getCartRaw();
-  const i = cart.find((x) => x.id === productId);
+  const color = options?.color?.trim() ?? '';
+  const size = options?.size?.trim() ?? '';
+  const i = cart.find((x) => itemMatch(x, productId, options));
   if (i) {
     i.qty = (i.qty || 1) + qty;
   } else {
-    cart.push({ id: productId, qty });
+    cart.push({ id: productId, qty, ...(color ? { color } : {}), ...(size ? { size } : {}) });
   }
   setCartRaw(cart);
   return cart;
 }
 
-export function removeFromCart(productId: string): CartItem[] {
-  const cart = getCartRaw().filter((x) => x.id !== productId);
+export function removeFromCart(productId: string, options?: AddToCartOptions): CartItem[] {
+  const cart = getCartRaw().filter((x) => !itemMatch(x, productId, options));
   setCartRaw(cart);
   return cart;
 }
 
-export function setCartQuantity(productId: string, qty: number): CartItem[] {
-  if (qty < 1) return removeFromCart(productId);
+export function setCartQuantity(productId: string, qty: number, options?: AddToCartOptions): CartItem[] {
+  if (qty < 1) return removeFromCart(productId, options);
   const cart = getCartRaw();
-  const i = cart.find((x) => x.id === productId);
+  const i = cart.find((x) => itemMatch(x, productId, options));
   if (i) {
     i.qty = qty;
   } else {
-    cart.push({ id: productId, qty });
+    const color = options?.color?.trim() ?? '';
+    const size = options?.size?.trim() ?? '';
+    cart.push({ id: productId, qty, ...(color ? { color } : {}), ...(size ? { size } : {}) });
   }
   setCartRaw(cart);
   return cart;

@@ -10,6 +10,8 @@ interface Props {
   currency?: string;
   color?: string;
   colors?: string[];
+  size?: string;
+  sizes?: Record<string, number>;
   position: string;
   productId?: string;
   stock?: boolean;
@@ -24,6 +26,8 @@ export default function CardProduct({
   currency = '',
   color,
   colors,
+  size,
+  sizes,
   position,
   productId,
   stock = true,
@@ -73,7 +77,12 @@ export default function CardProduct({
               {description}
             </p>
           )}
-          {colors && <div className="mb-2"><ProductBadge colors={colors} /></div>}
+          {colors && colors.length > 0 && <div className="mb-2"><ProductBadge colors={colors} /></div>}
+          {(size || (sizes && Object.keys(sizes).length > 0)) && (
+            <p className="small text-body-secondary mb-2">
+              Size available: {size ?? Object.keys(sizes!).join(', ')}
+            </p>
+          )}
           <div className="mt-auto pt-2">
             {price != null && price > 0 && (
               <p className="mb-1 fw-semibold fs-6">{currency}{price.toLocaleString()}</p>

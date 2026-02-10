@@ -96,6 +96,8 @@ export default function ProductPageFirebase({ productId }: Props) {
                 thumb_alt={p.thumb_alt ?? p.title}
                 color={p.color}
                 colors={p.colors}
+                size={p.size}
+                sizes={p.sizes}
                 title={p.title}
                 description={p.shortDescription ?? p.description}
                 price={p.discountPrice ?? p.price}

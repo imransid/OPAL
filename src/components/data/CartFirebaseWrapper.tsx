@@ -35,30 +35,30 @@ export default function CartFirebaseWrapper() {
       getProducts().then((all) => setSuggestions(all.slice(0, 4)));
       return;
     }
-    const ids = cartItems.map((i) => i.id);
+    const ids = [...new Set(cartItems.map((i) => i.id))];
     getProducts().then((all) => {
       const byId = new Map(all.map((p) => [p.id, p]));
-      const qtyById = new Map(cartItems.map((i) => [i.id, i.qty || 1]));
-      const cart = ids
-        .map((id) => {
-          const p = byId.get(id);
+      const cart: CartProduct[] = cartItems
+        .map((item) => {
+          const p = byId.get(item.id);
           if (!p) return null;
-          const qty = qtyById.get(id) ?? 1;
+          const qty = item.qty || 1;
+          const price = p.discountPrice ?? p.price;
           return {
             productId: p.id,
             thumb_src: p.thumb_src || p.images?.[0]?.src || '',
             thumb_alt: p.thumb_alt || p.title,
-            color: p.color || '',
+            color: item.color ?? p.color ?? '',
             title: p.title,
-            size: p.size || '',
-            price: p.discountPrice ?? p.price,
+            size: item.size ?? p.size ?? '',
+            price,
             currency: p.currency,
             stock: p.stock !== false,
             quantity: qty,
-            subtotal: (p.discountPrice ?? p.price) * qty,
-          } satisfies CartProduct;
+            subtotal: price * qty,
+          };
         })
-        .filter((x): x is CartProduct => x !== null);
+        .filter((x): x is NonNullable<typeof x> => x !== null);
       setCartProducts(cart);
       const suggested = all.filter((p) => !ids.includes(p.id)).slice(0, 4);
       setSuggestions(suggested);
@@ -70,8 +70,8 @@ export default function CartFirebaseWrapper() {
     loadCart();
   }, []);
 
-  const handleRemove = (productId: string) => {
-    removeFromCart(productId);
+  const handleRemove = (productId: string, options?: { color?: string; size?: string }) => {
+    removeFromCart(productId, options);
     loadCart();
   };
 
@@ -83,8 +83,8 @@ export default function CartFirebaseWrapper() {
     }
   };
 
-  const handleQuantityChange = (productId: string, qty: number) => {
-    setCartQuantity(productId, qty);
+  const handleQuantityChange = (productId: string, qty: number, options?: { color?: string; size?: string }) => {
+    setCartQuantity(productId, qty, options);
     loadCart();
   };
 
@@ -119,6 +119,8 @@ export default function CartFirebaseWrapper() {
                 thumb_alt={product.thumb_alt || product.title}
                 color={product.color}
                 colors={product.colors}
+                size={product.size}
+                sizes={product.sizes}
                 title={product.title}
                 description={product.shortDescription ?? product.description}
                 price={product.discountPrice ?? product.price}

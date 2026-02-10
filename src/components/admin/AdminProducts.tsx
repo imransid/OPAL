@@ -10,6 +10,7 @@ const defaultProduct: Omit<Product, 'id'> = {
   thumb_src: '',
   stock: true,
   colors: [],
+  sizes: {},
   images: [],
   resource: '',
 };
@@ -28,6 +29,9 @@ export default function AdminProducts() {
   const [jsonFeatures, setJsonFeatures] = useState('');
   const [jsonSpecs, setJsonSpecs] = useState('');
   const [jsonDelivery, setJsonDelivery] = useState('');
+  /** Raw comma-separated strings so user can type commas; parsed on submit */
+  const [colorsStr, setColorsStr] = useState('');
+  const [sizesStr, setSizesStr] = useState('');
 
   const load = async () => {
     setLoading(true);
@@ -70,6 +74,8 @@ export default function AdminProducts() {
     setEditing(null);
     setForm(defaultProduct);
     setJsonInput('');
+    setColorsStr('');
+    setSizesStr('');
     syncJsonFields(defaultProduct);
   };
 
@@ -94,7 +100,7 @@ export default function AdminProducts() {
       rating: p.rating,
       reviews: p.reviews,
       size: p.size,
-      sizes: p.sizes,
+      sizes: p.sizes ?? {},
       highlights: p.highlights,
       features: p.features,
       data: p.data,
@@ -108,6 +114,14 @@ export default function AdminProducts() {
       status: p.status,
       categoryId: p.categoryId,
     });
+    setColorsStr((p.colors ?? []).join(', '));
+    setSizesStr(
+      p.sizes && Object.keys(p.sizes).length > 0
+        ? Object.entries(p.sizes)
+            .map(([s, n]) => (n > 0 ? `${s}:${n}` : s))
+            .join(', ')
+        : ''
+    );
     syncJsonFields({
       ...p,
       longDescription: p.longDescription,
@@ -124,6 +138,14 @@ export default function AdminProducts() {
       const mapped = jsonToProduct(parsed);
       const next = { ...form, ...mapped };
       setForm(next);
+      setColorsStr((next.colors ?? []).join(', '));
+      setSizesStr(
+        next.sizes && Object.keys(next.sizes).length > 0
+          ? Object.entries(next.sizes)
+              .map(([s, n]) => (n > 0 ? `${s}:${n}` : s))
+              .join(', ')
+          : ''
+      );
       syncJsonFields(next);
       setShowImport(false);
     } catch (e) {
@@ -144,6 +166,20 @@ export default function AdminProducts() {
       setError('Invalid JSON in one of the fields: ' + (err instanceof Error ? err.message : String(err)));
       return;
     }
+    // Parse comma-separated strings into colors and sizes (so user can type commas in the fields)
+    merged.colors = colorsStr.split(',').map((s) => s.trim()).filter(Boolean);
+    const parsedSizes: Record<string, number> = {};
+    sizesStr.split(',').map((s) => s.trim()).filter(Boolean).forEach((part) => {
+      const colon = part.indexOf(':');
+      if (colon > 0) {
+        const k = part.slice(0, colon).trim();
+        const v = parseInt(part.slice(colon + 1).trim(), 10);
+        parsedSizes[k] = Number.isNaN(v) ? 0 : v;
+      } else {
+        parsedSizes[part] = 0;
+      }
+    });
+    merged.sizes = parsedSizes;
     try {
       if (editing) {
         await updateProduct(editing.id, merged);
@@ -152,6 +188,8 @@ export default function AdminProducts() {
       }
       setEditing(null);
       setForm(defaultProduct);
+      setColorsStr('');
+      setSizesStr('');
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to save');
@@ -300,6 +338,32 @@ export default function AdminProducts() {
                     </select>
                     <small className="text-body-secondary">Out of stock products are hidden from purchase.</small>
                   </div>
+                </div>
+                <div className="mb-2">
+                  <label className="form-label">Colour (summary)</label>
+                  <input type="text" className="form-control" value={form.color ?? ''} onChange={(e) => update('color', e.target.value || undefined)} placeholder="e.g. 8 colors" />
+                </div>
+                <div className="mb-2">
+                  <label className="form-label">Colours available</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={colorsStr}
+                    onChange={(e) => setColorsStr(e.target.value)}
+                    placeholder="red, blue, green"
+                  />
+                  <small className="text-body-secondary">Comma-separated list of colour names</small>
+                </div>
+                <div className="mb-2">
+                  <label className="form-label">Size available</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={sizesStr}
+                    onChange={(e) => setSizesStr(e.target.value)}
+                    placeholder="S, M, L or S:5, M:10"
+                  />
+                  <small className="text-body-secondary">Comma-separated. Optional stock per size: Size:qty</small>
                 </div>
                 <div className="mb-2">
                   <label className="form-label">Image URL (cover/thumb)</label>
@@ -459,6 +523,10 @@ export default function AdminProducts() {
                       <dd className="col-sm-9">{viewProduct.currency ?? ''}{viewProduct.price}{viewProduct.discountPrice != null ? ` (discount: ${viewProduct.currency ?? ''}${viewProduct.discountPrice})` : ''}</dd>
                       <dt className="col-sm-3">Stock</dt>
                       <dd className="col-sm-9">{viewProduct.stock !== false ? 'In stock' : 'Out of stock'}</dd>
+                      <dt className="col-sm-3">Colour</dt>
+                      <dd className="col-sm-9">{viewProduct.color ?? (viewProduct.colors?.length ? viewProduct.colors.join(', ') : '—')}</dd>
+                      <dt className="col-sm-3">Size available</dt>
+                      <dd className="col-sm-9">{viewProduct.sizes && Object.keys(viewProduct.sizes).length ? Object.keys(viewProduct.sizes).join(', ') : '—'}</dd>
                       <dt className="col-sm-3">Resource</dt>
                       <dd className="col-sm-9">{viewProduct.resource ?? '—'}</dd>
                       <dt className="col-sm-3">Slug</dt>

@@ -37,6 +37,19 @@ function normalizeProduct(docData: Record<string, unknown>, id: string): Product
   if (updatedAt != null && typeof updatedAt === 'object' && 'toMillis' in updatedAt && typeof (updatedAt as { toMillis: () => number }).toMillis === 'function') {
     data.updatedAt = (updatedAt as { toMillis: () => number }).toMillis();
   }
+  // Normalize size/color from Firebase so UI can always show them
+  if (!Array.isArray(data.colors)) data.colors = [];
+  if (data.sizes != null && typeof data.sizes === 'object' && !Array.isArray(data.sizes)) {
+    const raw = data.sizes as Record<string, unknown>;
+    const out: Record<string, number> = {};
+    for (const [k, v] of Object.entries(raw)) {
+      const n = typeof v === 'number' ? v : typeof v === 'string' ? parseInt(v, 10) : 0;
+      if (!Number.isNaN(n)) out[k] = n;
+    }
+    data.sizes = out;
+  } else {
+    data.sizes = data.sizes ?? {};
+  }
   return data as Product;
 }
 

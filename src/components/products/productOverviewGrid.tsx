@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import ProductRating from '../reviews/reviewRating';
 import ProductGallery from './productGallery';
 import ProductSizes from './productSizes';
+import ProductBadge from './productBadge';
 import { addToCart } from '../../lib/cart';
 import type { ProductFeature, LongDescription, ProductDelivery } from '../../lib/types';
 
@@ -62,10 +64,19 @@ export default function ProductOverview({
   delivery,
   stock = true,
 }: Props) {
+  const [selectedColor, setSelectedColor] = useState<string | undefined>(undefined);
+  const [selectedSize, setSelectedSize] = useState<string | undefined>(undefined);
+
   const desc = shortDescription ?? full_description ?? description ?? '';
   const hasDescription = desc || longDescription || highlights.length > 0 || details;
   const displayPrice = discountPrice != null && discountPrice < price ? discountPrice : price;
   const showStrike = discountPrice != null && discountPrice < price;
+
+  const hasColors = colors.length > 0;
+  const hasSizes = sizes.size > 0;
+  const colorOk = !hasColors || (selectedColor != null && selectedColor.trim() !== '');
+  const sizeOk = !hasSizes || (selectedSize != null && selectedSize.trim() !== '');
+  const canAddToCart = Boolean(stock && productId && colorOk && sizeOk);
 
   return (
     <div className="card card-product card-plain">
@@ -97,14 +108,32 @@ export default function ProductOverview({
               </div>
             )}
 
-            {sizes.size > 0 && <ProductSizes sizes={sizes} />}
+            <div className="mb-3">
+              <h6 className="mb-2">Colour {hasColors && <span className="text-danger small">*</span>}</h6>
+              {hasColors ? (
+                <ProductBadge colors={colors} selectedColor={selectedColor} onSelectColor={setSelectedColor} />
+              ) : (
+                <span className="text-body-secondary small">—</span>
+              )}
+            </div>
+
+            <div className="mb-3">
+              <h6 className="mb-2">Size available {hasSizes && <span className="text-danger small">*</span>}</h6>
+              {hasSizes ? (
+                <ProductSizes sizes={sizes} selectedSize={selectedSize} onSelectSize={setSelectedSize} />
+              ) : (
+                <span className="text-body-secondary small">—</span>
+              )}
+            </div>
+            {!colorOk && hasColors && <p className="small text-danger mb-2">Please select a colour.</p>}
+            {!sizeOk && hasSizes && <p className="small text-danger mb-2">Please select a size.</p>}
             <button
               className="btn btn-dark btn-lg mt-3"
               type="button"
-              disabled={!stock}
+              disabled={!canAddToCart}
               onClick={() => {
-                if (!productId || !stock) return;
-                addToCart(productId);
+                if (!productId || !canAddToCart) return;
+                addToCart(productId, 1, { color: selectedColor, size: selectedSize });
                 if (typeof window !== 'undefined') {
                   window.dispatchEvent(new CustomEvent('opal-cart-update'));
                   window.dispatchEvent(new CustomEvent('opal-show-toast', { detail: { message: 'Added to cart', productName: title } }));

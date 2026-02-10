@@ -15,12 +15,17 @@ export interface CartProduct {
   subtotal: number;
 }
 
+interface CartOptions {
+  color?: string;
+  size?: string;
+}
+
 interface Props {
   products: CartProduct[];
   shipping: number;
   currency?: string;
-  onRemove: (productId: string) => void;
-  onQuantityChange: (productId: string, qty: number) => void;
+  onRemove: (productId: string, options?: CartOptions) => void;
+  onQuantityChange: (productId: string, qty: number, options?: CartOptions) => void;
   onClearAll?: () => void;
 }
 
@@ -45,7 +50,7 @@ export default function ShoppingCart({ products, shipping, currency = '৳', onR
                 </div>
               )}
             {products.map((product, i) => (
-              <div key={product.productId}>
+              <div key={`${product.productId}-${product.color}-${product.size}`}>
                 {i > 0 && <hr className="horizontal dark my-2" />}
                 <ProductCartItem
                   productId={product.productId}
@@ -58,8 +63,8 @@ export default function ShoppingCart({ products, shipping, currency = '৳', onR
                   currency={product.currency}
                   stock={product.stock}
                   quantity={product.quantity}
-                  onQuantityChange={(qty) => onQuantityChange(product.productId, qty)}
-                  onRemove={() => onRemove(product.productId)}
+                  onQuantityChange={(qty) => onQuantityChange(product.productId, qty, { color: product.color || undefined, size: product.size || undefined })}
+                  onRemove={() => onRemove(product.productId, { color: product.color || undefined, size: product.size || undefined })}
                 />
               </div>
             ))}

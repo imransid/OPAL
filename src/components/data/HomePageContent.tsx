@@ -612,6 +612,8 @@ export default function HomePageContent() {
                     thumb_alt={product.thumb_alt || product.title}
                     color={product.color}
                     colors={product.colors}
+                    size={product.size}
+                    sizes={product.sizes}
                     title={product.title}
                     description={product.shortDescription || product.description}
                     price={product.price}
@@ -668,6 +670,8 @@ export default function HomePageContent() {
                   thumb_alt={product.thumb_alt || product.title}
                   color={product.color}
                   colors={product.colors}
+                  size={product.size}
+                  sizes={product.sizes}
                   title={product.title}
                   description={product.shortDescription || product.description}
                   price={product.price}

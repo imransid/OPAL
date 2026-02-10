@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getProducts, getStoreSettings } from '../../lib/firestore';
-import { getCart } from '../../lib/cart';
+import { getCart, type CartItem } from '../../lib/cart';
 import type { Product } from '../../lib/types';
 import CheckoutOrderSummary from '../checkout/checkoutOrderSummary';
 import StoreDoubleColumn from '../store/storeDoubleColumn';
@@ -11,7 +11,7 @@ function computeShipping(subtotal: number, shippingCost: number, freeThreshold: 
 }
 
 export default function CheckoutFirebaseWrapper() {
-  const [cartProducts, setCartProducts] = useState<{ product: Product; qty: number }[]>([]);
+  const [cartProducts, setCartProducts] = useState<{ product: Product; item: CartItem }[]>([]);
   const [loading, setLoading] = useState(true);
   const [shippingCost, setShippingCost] = useState(0);
   const [freeShippingThreshold, setFreeShippingThreshold] = useState(0);
@@ -32,12 +32,16 @@ export default function CheckoutFirebaseWrapper() {
       setLoading(false);
       return;
     }
-    const ids = items.map((i) => i.id);
-    const qtyById = new Map(items.map((i) => [i.id, i.qty || 1]));
+    const ids = [...new Set(items.map((i) => i.id))];
     getProducts().then((all) => {
-      const cart = all
-        .filter((p) => ids.includes(p.id))
-        .map((p) => ({ product: p, qty: qtyById.get(p.id) ?? 1 }));
+      const byId = new Map(all.map((p) => [p.id, p]));
+      const cart = items
+        .map((item) => {
+          const product = byId.get(item.id);
+          if (!product) return null;
+          return { product, item };
+        })
+        .filter((x): x is { product: Product; item: CartItem } => x !== null);
       setCartProducts(cart);
       setLoading(false);
     });
@@ -63,19 +67,20 @@ export default function CheckoutFirebaseWrapper() {
     );
   }
 
-  const subtotal = cartProducts.reduce((sum, { product: p, qty }) => sum + (p.discountPrice ?? p.price) * qty, 0);
+  const subtotal = cartProducts.reduce((sum, { product: p, item }) => sum + (p.discountPrice ?? p.price) * (item.qty || 1), 0);
   const shipping = computeShipping(subtotal, shippingCost, freeShippingThreshold);
 
-  const forSummary = cartProducts.map(({ product: p, qty }) => {
+  const forSummary = cartProducts.map(({ product: p, item }) => {
     const price = p.discountPrice ?? p.price;
+    const qty = item.qty || 1;
     return {
       productId: p.id,
       thumb_src: p.thumb_src || p.images?.[0]?.src || '',
-      thumb_alt: p.thumb_alt || p.title,
-      color: p.color || '',
+      thumb_alt: p.thumb_alt ?? p.title,
+      color: item.color ?? p.color ?? '',
       title: p.title,
       price,
-      size: p.size || '',
+      size: item.size ?? p.size ?? '',
       quantity: qty,
       subtotal: price * qty,
     };
