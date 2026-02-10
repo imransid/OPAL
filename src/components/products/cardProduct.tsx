@@ -28,67 +28,64 @@ export default function CardProduct({
   productId,
   stock = true,
 }: Props) {
-
-  const classList = "card-body " + "text-" + position;
-  const productUrl = productId ? `/product/?id=${productId}` : "#";
+  const classList = 'card-body d-flex flex-column text-' + position;
+  const productUrl = productId ? `/product/?id=${productId}` : '#';
   const imgSrc = thumb_src ? toImageSrc(thumb_src) : '';
 
   return (
-    <>
-      <div className="card card-product border mb-5 shadow-xs border-radius-lg">
-        <a href={productUrl}>
-          <div className="position-relative overflow-hidden" style={{ height: 280 }}>
-            {imgSrc && (
-              <img
-                className="w-100 h-100 p-4 rounded-top"
-                style={{ objectFit: 'cover', display: 'block' }}
-                src={imgSrc}
-                alt={thumb_alt}
-                loading="lazy"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                  const placeholder = (e.target as HTMLImageElement).parentElement?.querySelector('.card-img-placeholder');
-                  if (placeholder) (placeholder as HTMLElement).classList.remove('d-none');
-                }}
-              />
-            )}
-            <div className={`card-img-placeholder w-100 h-100 position-absolute top-0 start-0 d-flex align-items-center justify-content-center bg-light text-body-secondary rounded-top ${imgSrc ? 'd-none' : ''}`}>
-              No image
-            </div>
+    <div className="card card-product h-100 border-0 rounded-3 overflow-hidden shadow-sm bg-white transition-all duration-200 hover-shadow">
+      <a href={productUrl} className="text-decoration-none text-dark d-flex flex-column h-100">
+        {/* Fixed aspect ratio image - same height on all cards */}
+        <div
+          className="position-relative overflow-hidden bg-light"
+          style={{ aspectRatio: '1' }}
+        >
+          {imgSrc && (
+            <img
+              className="w-100 h-100"
+              style={{ objectFit: 'cover', display: 'block' }}
+              src={imgSrc}
+              alt={thumb_alt}
+              loading="lazy"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+                const placeholder = (e.target as HTMLImageElement).parentElement?.querySelector('.card-img-placeholder');
+                if (placeholder) (placeholder as HTMLElement).classList.remove('d-none');
+              }}
+            />
+          )}
+          <div
+            className={`card-img-placeholder w-100 h-100 position-absolute top-0 start-0 d-flex align-items-center justify-content-center text-body-secondary ${imgSrc ? 'd-none' : ''}`}
+            style={{ fontSize: '0.875rem' }}
+          >
+            No image
           </div>
-          <div className={classList}>
-            {(color) && 
-              <h6 className="text-md mb-1 text-body">{color}</h6>
-            }
-            {(title) && 
-              <h4 className="font-weight-bold">
-                {title}
-              </h4>
-            }
-
-            {(description) && 
-              <p className="text-body">{description}</p>
-            }
-           
-            {(colors) &&
-              <ProductBadge colors={colors} />
-            }
-            
-            {(price != null && price > 0) && (
-              <h4 className="mb-0 text-lg mt-1">{currency}{price.toLocaleString()}</h4>
+        </div>
+        <div className={classList} style={{ flex: '1 1 auto' }}>
+          {color && <h6 className="text-uppercase small mb-1 text-body-secondary">{color}</h6>}
+          {title && (
+            <h3 className="h6 fw-semibold mb-1 text-dark lh-sm" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+              {title}
+            </h3>
+          )}
+          {description && (
+            <p className="small text-body-secondary mb-2 lh-sm" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', flex: '0 1 auto' }}>
+              {description}
+            </p>
+          )}
+          {colors && <div className="mb-2"><ProductBadge colors={colors} /></div>}
+          <div className="mt-auto pt-2">
+            {price != null && price > 0 && (
+              <p className="mb-1 fw-semibold fs-6">{currency}{price.toLocaleString()}</p>
             )}
-            <p className="mb-0 mt-2 small text-body-secondary">
+            <p className="mb-0 small text-body-secondary">
               <span className={stock !== false ? 'text-success' : 'text-secondary'}>
-                {stock !== false ? '● Available' : '○ Out of stock'}
+                {stock !== false ? '● In stock' : '○ Out of stock'}
               </span>
             </p>
-
-            {!(description || colors || color) &&
-              <a href="#" className="font-weight-normal text-body text-sm">Shop Now</a>
-            }
           </div>
-        </a>
-      </div>
-    </>
+        </div>
+      </a>
+    </div>
   );
-};
+}
