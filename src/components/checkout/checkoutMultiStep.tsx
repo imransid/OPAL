@@ -23,10 +23,7 @@ export default function CheckoutSummary({
   products,
 }: Props) {
 
-  let subtotalCheckout = 0;
-  products.map(product => 
-    subtotalCheckout += product.price
-  )
+  const subtotalCheckout = products.reduce((sum, p) => sum + (p.subtotal ?? p.price), 0);
 
   return (
     <>
@@ -70,7 +67,7 @@ export default function CheckoutSummary({
                   price={product.price}
                 />
             )}
-            <OrderSummary subtotal={subtotalCheckout}/>
+            <OrderSummary subtotal={subtotalCheckout} shipping={0} currency="$" />
           </div>
         </div>
       </section>

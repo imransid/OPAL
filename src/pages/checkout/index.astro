@@ -1,0 +1,19 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import '../../../assets/scss/astro-ecommerce.scss';
+import Navbar from '../../components/navbar';
+import Footer from '../../components/footer';
+import CheckoutFirebaseWrapper from '../../components/data/CheckoutFirebaseWrapper';
+---
+
+<Layout
+	title="Checkout — OPAL"
+	description="Complete your order. Secure checkout at OPAL."
+	noindex
+>
+	<main>
+		<Navbar client:load />
+		<CheckoutFirebaseWrapper client:load />
+		<Footer />
+	</main>
+</Layout>

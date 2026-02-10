@@ -1,0 +1,19 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import '../../../assets/scss/astro-ecommerce.scss';
+import Navbar from '../../components/navbar';
+import Footer from '../../components/footer';
+import ShopFirebaseContent from '../../components/data/ShopFirebaseContent';
+---
+
+<Layout
+	title="Shop All Products — OPAL | Browse Curated Collection"
+	description="Browse our full collection of curated products. Shop quality items with secure checkout and fast delivery at OPAL."
+	image="/images/opal1.jpg"
+>
+	<main>
+		<Navbar client:load />
+		<ShopFirebaseContent client:load />
+		<Footer />
+	</main>
+</Layout>

@@ -1,0 +1,11 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AdminGate from '../../components/admin/AdminGate';
+import '../../../assets/scss/astro-ecommerce.scss';
+
+const adminEmail = import.meta.env.PUBLIC_ADMIN_EMAIL ?? 'emailofimran1992@gmail.com';
+---
+
+<Layout title="Admin — OPAL" description="Admin panel" noindex>
+	<AdminGate client:load adminEmail={adminEmail} />
+</Layout>

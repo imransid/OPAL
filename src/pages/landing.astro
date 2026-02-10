@@ -10,9 +10,13 @@ import TestimonialsFade from '../components/promo/testimonialsFade';
 import PromoSectionLarge from '../components/promo/promoSectionLarge';
 ---
 
-<Layout title="Landing Page">
+<Layout
+	title="OPAL Collection — Curated Products | Shop Now"
+	description="Discover our latest collection at OPAL. Shop by category, explore featured products, and find quality items for every moment."
+	image="/images/opal1.jpg"
+>
 	<main>
-    <Navbar />
+    <Navbar client:load />
     <PromoSectionLarge 
       title={"Collection is here"}
       full_description={data.products[0].full_description}  

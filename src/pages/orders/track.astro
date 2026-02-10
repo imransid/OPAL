@@ -1,0 +1,18 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import '../../../assets/scss/astro-ecommerce.scss';
+import Navbar from '../../components/navbar';
+import Footer from '../../components/footer';
+import OrderTrackContent from '../../components/orders/OrderTrackContent';
+---
+
+<Layout
+	title="Track Your Order — OPAL"
+	description="Track your OPAL order status. Enter your order number to see shipping and delivery updates."
+>
+	<main>
+		<Navbar client:load />
+		<OrderTrackContent client:load />
+		<Footer />
+	</main>
+</Layout>

@@ -1,0 +1,18 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import '../../../assets/scss/astro-ecommerce.scss';
+import Navbar from '../../components/navbar';
+import Footer from '../../components/footer';
+import ContactPageContent from '../../components/data/ContactPageContent';
+---
+
+<Layout
+	title="Contact Us — OPAL | Get in Touch"
+	description="Have a question or need help? Contact OPAL. We're here for you. Send a message and we'll get back to you as soon as we can."
+>
+	<main>
+		<Navbar client:load />
+		<ContactPageContent client:load />
+		<Footer />
+	</main>
+</Layout>

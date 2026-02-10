@@ -1,12 +1,14 @@
-import data from '../../../public/data.json';
-import CardProduct from '../products/cardProduct';
+import CardProduct from './cardProduct';
+import type { Product } from '../../lib/types';
 
 interface Props {
   title: string;
+  products?: Product[];
 }
 
-export default function ProductOverview({
+export default function CategoryFilters({
   title,
+  products = [],
 }: Props) {
 
   return (
@@ -157,17 +159,18 @@ export default function ProductOverview({
           <div className="col-12 col-md-8">
             <div className="d-flex h-100">
               <div className="row">
-                {data.products.slice(0, 3).map(product => 
-                  <div class="col-md-6 col-lg-4">
+                {products.slice(0, 3).map(product => 
+                  <div key={product.id} className="col-md-6 col-lg-4">
                     <CardProduct 
-                      thumb_src = {product.thumb_src}
-                      thumb_alt = {product.thumb_alt}
-                      color = {product.color}
-                      colors = {product.colors}
-                      title = {product.title}
-                      description = {product.description}
-                      price = {product.price}
-                      position = "center"
+                      thumb_src={product.thumb_src}
+                      thumb_alt={product.thumb_alt || product.title}
+                      color={product.color}
+                      colors={product.colors}
+                      title={product.title}
+                      description={product.description}
+                      price={product.price}
+                      position="center"
+                      productId={product.id}
                     />
                   </div>
                 )}        

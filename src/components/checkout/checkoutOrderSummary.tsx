@@ -1,83 +1,220 @@
+import { useState } from 'react';
 import PaymentDetails from './paymentDetails';
 import ShippingInfo from './shippingInfo';
 import BillingInfo from './billingInfo';
 import OrderSummary from '../cart/orderSummary';
 import CheckoutSingleItem from '../checkout/checkoutSingleItem';
+import { createOrder } from '../../lib/firestore';
+import { clearCart } from '../../lib/cart';
+
+interface ProductItem {
+  productId: string;
+  thumb_src: string;
+  thumb_alt: string;
+  color: string;
+  title: string;
+  price: number;
+  size: string;
+  quantity: number;
+  subtotal: number;
+}
 
 interface Props {
-  products: ({
-    thumb_src: string;
-    thumb_alt: string;
-    color: string;
-    title: string;
-    price: number;
-    size: string;
-    stock: string;
-    subtotal: number;
-    shipping: number;
-    tax: number;
-  })[];
-  textColor: string
+  products: ProductItem[];
+  subtotal: number;
+  shipping: number;
+  currency?: string;
 }
 
 export default function CheckoutSummary({
- products,
- textColor
+  products,
+  subtotal,
+  shipping,
+  currency = '৳',
 }: Props) {
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
+  const [postalCode, setPostalCode] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'card'>('cod');
+  const [cardNumber, setCardNumber] = useState('');
+  const [expiry, setExpiry] = useState('');
+  const [cvc, setCvc] = useState('');
+  const [sameAsShipping, setSameAsShipping] = useState(true);
+  const [triedSubmit, setTriedSubmit] = useState(false);
+  const [placing, setPlacing] = useState(false);
+  const [error, setError] = useState('');
 
-  let subtotalCheckout = 0;
-  products.map(product => 
-    subtotalCheckout += product.price
-  )
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setTriedSubmit(true);
+    setError('');
+    const emailValid = email.trim().length > 0;
+    const phoneValid = phone.trim().length > 0;
+    const addressValid = address.trim().length > 0;
+    if (!emailValid || !phoneValid || !addressValid) return;
+
+    setPlacing(true);
+    try {
+      const { orderNumber } = await createOrder({
+        items: products.map((p) => ({
+          productId: p.productId,
+          title: p.title,
+          price: p.price,
+          quantity: p.quantity,
+          subtotal: p.subtotal,
+          thumb_src: p.thumb_src,
+          color: p.color || undefined,
+          size: p.size || undefined,
+        })),
+        contact: { email: email.trim(), phone: phone.trim() },
+        shipping: { address: address.trim(), city, state, postalCode },
+        paymentMethod,
+        subtotal,
+        shippingCost: shipping,
+        currency,
+      });
+      clearCart();
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('opal-cart-update'));
+      }
+      window.location.href = `/orders/track?order=${encodeURIComponent(orderNumber)}&email=${encodeURIComponent(email.trim())}`;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to place order. Try again.');
+    } finally {
+      setPlacing(false);
+    }
+  };
 
   return (
-    <>
-      <section>
-        <div className="row">
-          <div className="col-12 col-lg-6 p-3 p-md-5 bg-gray-100">
-            <h5 className="mb-4">Contact information</h5>
-            <div className="form-group">
-              <label>Email address</label>
-              <input type="email" className="form-control" placeholder="Enter your email address" />
+    <section className="rounded-3 overflow-hidden shadow-lg">
+      <form onSubmit={handleSubmit}>
+      <div className="row g-0">
+        <div className="col-12 col-lg-6 p-4 p-lg-5 bg-white">
+          <div className="mb-4">
+            <h5 className="mb-3 fw-semibold">Contact information</h5>
+            <div className="mb-3">
+              <label className="form-label small text-body-secondary">Email <span className="text-danger">*</span></label>
+              <input
+                type="email"
+                className={`form-control form-control-lg ${triedSubmit && !email.trim() ? 'is-invalid' : ''}`}
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                aria-required="true"
+              />
+              {triedSubmit && !email.trim() && <div className="invalid-feedback">Email is required</div>}
             </div>
-
-            <h5 className="mt-5 mb-4">Shipping address</h5>
-            <ShippingInfo />
-
-            <h5 className="mt-5 mb-4">Payment details</h5>
-            <PaymentDetails />
-
-            <h5 className="mt-5 mb-4">Billing information</h5>
-            <BillingInfo />
-
-            <hr className="dark horizontal"/>
-            <button className="btn btn-dark float-end mt-2 mb-0">
-              <svg className="me-1" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-               <path d="M2.80039 2.80005C2.02719 2.80005 1.40039 3.42685 1.40039 4.20005V4.90005H12.6004V4.20005C12.6004 3.42685 11.9736 2.80005 11.2004 2.80005H2.80039Z" fill="white"/>
-                <path fill-rule="evenodd" clipRule="evenodd" d="M12.6004 6.30005H1.40039V9.80005C1.40039 10.5733 2.02719 11.2 2.80039 11.2H11.2004C11.9736 11.2 12.6004 10.5733 12.6004 9.80005V6.30005ZM2.80039 9.10005C2.80039 8.71344 3.11379 8.40005 3.50039 8.40005H4.20039C4.58699 8.40005 4.90039 8.71344 4.90039 9.10005C4.90039 9.48666 4.58699 9.80005 4.20039 9.80005H3.50039C3.11379 9.80005 2.80039 9.48666 2.80039 9.10005ZM6.30039 8.40005C5.91379 8.40005 5.60039 8.71344 5.60039 9.10005C5.60039 9.48666 5.91379 9.80005 6.30039 9.80005H7.00039C7.387 9.80005 7.70039 9.48666 7.70039 9.10005C7.70039 8.71344 7.387 8.40005 7.00039 8.40005H6.30039Z" fill="white"/>
-              </svg>
-              Proceed to payment
-
-            </button>
+            <div>
+              <label className="form-label small text-body-secondary">Phone number <span className="text-danger">*</span></label>
+              <input
+                type="tel"
+                className={`form-control form-control-lg ${triedSubmit && !phone.trim() ? 'is-invalid' : ''}`}
+                placeholder="+880 1XXX-XXXXXX"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                required
+                aria-required="true"
+              />
+              {triedSubmit && !phone.trim() && <div className="invalid-feedback">Phone number is required</div>}
+            </div>
           </div>
-          <div className="col-12 col-lg-6 p-3 p-md-5 bg-dark bg-gradient rounded-end">
-            <p className="text-white opacity-6 mb-0 text-end">Amount</p>
-            <h3 className="text-white mb-4 text-end">${subtotalCheckout.toLocaleString()}</h3>
-            {products.map((product, i) => 
-                <CheckoutSingleItem
-                  thumb_src={product.thumb_src}
-                  thumb_alt={product.thumb_alt}
-                  title={product.title}
-                  color={product.color}
-                  size={product.size}
-                  price={product.price}
+
+          <div className="mb-4">
+            <h5 className="mb-3 fw-semibold">Shipping address</h5>
+            <ShippingInfo
+              address={address}
+              city={city}
+              state={state}
+              postalCode={postalCode}
+              onAddressChange={setAddress}
+              onCityChange={setCity}
+              onStateChange={setState}
+              onPostalCodeChange={setPostalCode}
+              required
+              addressInvalid={triedSubmit && !address.trim()}
+            />
+          </div>
+
+          <div className="mb-4">
+            <h5 className="mb-3 fw-semibold">Payment method</h5>
+            <div className="mb-3">
+              <div className="form-check mb-2">
+                <input
+                  className="form-check-input"
+                  type="radio"
+                  name="payment"
+                  id="pay-cod"
+                  checked={paymentMethod === 'cod'}
+                  onChange={() => setPaymentMethod('cod')}
                 />
+                <label className="form-check-label" htmlFor="pay-cod">
+                  <strong>COD</strong> — Cash on Delivery (Pay when you receive)
+                </label>
+              </div>
+              <div className="form-check">
+                <input
+                  className="form-check-input"
+                  type="radio"
+                  name="payment"
+                  id="pay-card"
+                  checked={paymentMethod === 'card'}
+                  onChange={() => setPaymentMethod('card')}
+                />
+                <label className="form-check-label" htmlFor="pay-card">
+                  Credit / Debit Card
+                </label>
+              </div>
+            </div>
+            {paymentMethod === 'card' && (
+              <PaymentDetails
+                cardNumber={cardNumber}
+                expiry={expiry}
+                cvc={cvc}
+                onCardNumberChange={setCardNumber}
+                onExpiryChange={setExpiry}
+                onCvcChange={setCvc}
+              />
             )}
-            <OrderSummary subtotal={subtotalCheckout} textColor="white" />
           </div>
-        </div>
-      </section>
-    </>
-  );
-};
 
+          <div className="mb-4">
+            <h5 className="mb-3 fw-semibold">Billing information</h5>
+            <BillingInfo sameAsShipping={sameAsShipping} onSameAsShippingChange={setSameAsShipping} />
+          </div>
+
+          {error && <div className="alert alert-danger mb-3">{error}</div>}
+          <button type="submit" className="btn btn-dark btn-lg w-100 py-3" disabled={placing}>
+            {placing ? <span className="spinner-border spinner-border-sm me-2" aria-hidden /> : <i className="bi bi-lock-fill me-2" aria-hidden />}
+            {placing ? 'Placing order…' : `Place order · ${currency}${(subtotal + shipping).toLocaleString()}`}
+          </button>
+        </div>
+
+        <div className="col-12 col-lg-6 p-4 p-lg-5 text-white" style={{ background: 'linear-gradient(160deg, #1a1a1a 0%, #2d2d2d 100%)' }}>
+          <h5 className="mb-4 fw-semibold text-white">Order summary</h5>
+          <div className="mb-4">
+            {products.map((product, i) => (
+              <CheckoutSingleItem
+                key={i}
+                thumb_src={product.thumb_src}
+                thumb_alt={product.thumb_alt}
+                title={product.title}
+                color={product.color}
+                size={product.size}
+                price={product.price}
+                quantity={product.quantity}
+                subtotal={product.subtotal}
+                currency={currency}
+              />
+            ))}
+          </div>
+          <OrderSummary subtotal={subtotal} shipping={shipping} currency={currency} textColor="white" />
+        </div>
+      </div>
+      </form>
+    </section>
+  );
+}

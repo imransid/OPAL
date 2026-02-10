@@ -53,6 +53,8 @@ export default function ShoppingCart({
               <div className="card-body p-lg-5">
                 <OrderSummary 
                   subtotal={subtotal}
+                  shipping={0}
+                  currency="$"
                 />
               </div>
             </div>

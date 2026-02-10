@@ -1,49 +1,35 @@
 interface Props {
   subtotal: number;
-  textColor: string
+  shipping: number;
+  currency?: string;
+  textColor?: string;
 }
 
 export default function OrderSummary({
   subtotal,
-  textColor
+  shipping,
+  currency = '৳',
+  textColor = '',
 }: Props) {
+  const variant = textColor ? ` text-${textColor}` : '';
+  const total = subtotal + shipping;
+  const labelClass = textColor ? `text-${textColor}` : 'text-body';
+  const valueClass = textColor ? `text-${textColor} fw-semibold` : 'fw-semibold';
 
-  const tax = 7;
-  const shipping = (subtotal >= 100) ?  0 : 25;
-  let sum = 0;
-  sum+=subtotal;
-
-  let variant = "";
-
-  if (textColor) {
-    variant = ` text-${textColor}`;
-  }
   return (
     <>
-      <ul className="list-unstyled">
-        <li className="mt-2">
-          <div className="d-flex justify-content-between">
-            <p className={`opacity-8` + variant}>Subtotal</p>
-            <p className={`fw-bold opacity-8` + variant}>${sum.toLocaleString()}</p>
-          </div>
+      <ul className="list-unstyled mb-0">
+        <li className="py-2 d-flex justify-content-between align-items-center">
+          <span className={labelClass}>Subtotal</span>
+          <span className={valueClass}>{currency}{subtotal.toLocaleString()}</span>
         </li>
-        <li className="mt-2">
-          <div className="d-flex justify-content-between">
-            <p className={`opacity-8` + variant}>Shipping estimate <span data-bs-toggle="tooltip" data-bs-placement="top" title="More information related to shipping" data-container="body" data-animation="true"><i className="fas fa-question-circle text-sm"></i></span></p>
-            <p className={`fw-bold opacity-8` + variant}>${shipping.toLocaleString()}</p>
-          </div>
+        <li className="py-2 d-flex justify-content-between align-items-center border-bottom border-white border-opacity-25">
+          <span className={labelClass}>Shipping</span>
+          <span className={valueClass}>{currency}{shipping.toLocaleString()}</span>
         </li>
-        <li className="border-bottom mt-2">
-          <div className="d-flex justify-content-between">
-            <p className={`opacity-8` + variant}>Tax estimate <span data-bs-toggle="tooltip" data-bs-placement="top" title="This may vary depending on the country you are in" data-container="body" data-animation="true"><i className="fas fa-question-circle text-sm"></i></span></p>
-            <p className={`fw-bold opacity-8` + variant}>${tax.toLocaleString()}</p>
-          </div>
-        </li>
-        <li className="mt-4">
-          <div className="d-flex justify-content-between">
-            <h5 className={variant}>Total</h5>
-            <h5 className={variant}>${(subtotal + shipping + tax).toLocaleString()}</h5>
-          </div>
+        <li className="py-3 d-flex justify-content-between align-items-center">
+          <span className={`${variant} fw-bold`}>Total</span>
+          <span className={`${variant} fw-bold fs-5`}>{currency}{total.toLocaleString()}</span>
         </li>
       </ul>
     </>

@@ -1,59 +1,83 @@
+import { toImageSrc } from '../../lib/image-utils';
+
 interface Props {
+  productId: string;
   thumb_src: string;
   thumb_alt: string;
   title: string;
   color: string;
   size: string;
   price: number;
+  currency?: string;
   stock: boolean;
+  quantity: number;
+  onQuantityChange: (qty: number) => void;
+  onRemove: () => void;
 }
 
 export default function CartItem({
+  productId,
   thumb_src,
   thumb_alt,
   title,
   color,
   size,
   price,
+  currency = '',
   stock,
-
+  quantity,
+  onQuantityChange,
+  onRemove,
 }: Props) {
+  const imgSrc = toImageSrc(thumb_src);
+  const subtotal = price * quantity;
 
   return (
-    <>
-      <div className="d-block d-md-flex">
-        <img className="w-50 w-md-30 rounded-3" src={`${import.meta.env.BASE_URL}${thumb_src}`} alt={thumb_alt} />
-        <div className="w-100 w-md-50 ps-md-4">
-          <h6 className="text-lg mb-1">{title}</h6>
-          <div className="d-flex">
-            <p className="pe-3 mb-0">{color}</p>
-            <p className="border-start ps-3 mb-0">{size}</p>
-          </div>
-          <div className="d-flex align-items-center mt-6">
-           {(stock) ? 
-            <>
-              <i className="fas fa-check text-lg text-success"></i>
-              <p className="mb-0 ms-2 text-sm">In Stock</p>
-            </>
-            :
-            <>
-              <i className="fas fa-minus-circle text-lg"></i>
-              <p className="mb-0 ms-2 text-sm">Out of Stock</p>
-            </>
-           }
-          </div>
+    <div className="d-block d-md-flex align-items-center py-3">
+      {imgSrc && (
+        <img
+          className="rounded-3 me-0 me-md-4"
+          src={imgSrc}
+          alt={thumb_alt}
+          style={{ width: '120px', height: '120px', objectFit: 'cover' }}
+        />
+      )}
+      <div className="flex-grow-1 mt-3 mt-md-0">
+        <h6 className="text-lg mb-1">{title}</h6>
+        <div className="d-flex gap-2 small text-body-secondary">
+          {color && <span>{color}</span>}
+          {size && <span>{size}</span>}
         </div>
-        <div className="w-20 w-md-10 mt-4 mt-md-0">
-          <input type="number" min={0} className="form-control" placeholder="1" aria-label="amount" />
-        </div>
-        <h4 className="ms-3">${price.toLocaleString()}</h4>
-
-        <div className="w-10 text-end">
-          <a href="#">
-            <i className="fas fa-times ms-3"></i>
-          </a>
-        </div>
+        <p className="mb-0 mt-2 small">
+          <strong>Availability:</strong>{' '}
+          <span className={stock ? 'text-success' : 'text-secondary'}>
+            {stock ? 'In stock' : 'Out of stock'}
+          </span>
+        </p>
       </div>
-    </>
+      <div className="mt-3 mt-md-0 d-flex align-items-center gap-2">
+        <input
+          type="number"
+          min={1}
+          max={99}
+          className="form-control text-center"
+          style={{ width: '60px' }}
+          value={quantity}
+          onChange={(e) => onQuantityChange(Math.max(1, Math.min(99, parseInt(e.target.value, 10) || 1)))}
+          aria-label="Quantity"
+        />
+        <span className="fw-bold" style={{ minWidth: '80px' }}>
+          {currency}{subtotal.toLocaleString()}
+        </span>
+        <button
+          type="button"
+          className="btn btn-link text-danger p-0"
+          onClick={onRemove}
+          aria-label="Remove"
+        >
+          <i className="fas fa-times" />
+        </button>
+      </div>
+    </div>
   );
 }

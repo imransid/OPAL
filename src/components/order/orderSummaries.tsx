@@ -110,6 +110,8 @@ export default function OrderSummaries({
           <div className="col-12 col-lg-6">
             <OrderSummary 
               subtotal={subtotal} 
+              shipping={0} 
+              currency="$" 
               textColor=""  
             />
           </div>
