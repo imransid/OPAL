@@ -165,15 +165,27 @@ export default function HomePageContent() {
           0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
           50% { transform: translate(4%, -6%) scale(1.05); opacity: 0.6; }
         }
+        @keyframes hero-badge-glow {
+          0%, 100% { box-shadow: 0 0 20px rgba(99,102,241,0.2), inset 0 1px 0 rgba(255,255,255,0.15); }
+          50% { box-shadow: 0 0 28px rgba(99,102,241,0.35), inset 0 1px 0 rgba(255,255,255,0.2); }
+        }
+        @keyframes hero-headline-shine {
+          0% { background-position: 200% center; }
+          100% { background-position: -200% center; }
+        }
+        @keyframes hero-cta-pulse {
+          0%, 100% { box-shadow: 0 4px 24px rgba(255,255,255,0.2), inset 0 1px 0 rgba(255,255,255,0.35); }
+          50% { box-shadow: 0 6px 32px rgba(255,255,255,0.3), inset 0 1px 0 rgba(255,255,255,0.45); }
+        }
         .home-hero-copy-wrap { z-index: 10; pointer-events: auto; }
         .home-hero-section .hero-carousel-frame,
         .home-hero-section .home-hero-mesh { z-index: 0; }
         .hero-glass-panel {
-          background: rgba(255,255,255,0.06);
-          backdrop-filter: blur(24px) saturate(180%);
-          -webkit-backdrop-filter: blur(24px) saturate(180%);
-          border: 1px solid rgba(255,255,255,0.12);
-          box-shadow: 0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.1);
+          background: linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%);
+          backdrop-filter: blur(28px) saturate(180%);
+          -webkit-backdrop-filter: blur(28px) saturate(180%);
+          border: 1px solid rgba(255,255,255,0.15);
+          box-shadow: 0 12px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.12), 0 0 60px rgba(99,102,241,0.08);
           border-radius: 1.5rem;
           position: relative;
           overflow: hidden;
@@ -188,49 +200,54 @@ export default function HomePageContent() {
           border-radius: inherit;
         }
         .hero-glass-panel:hover {
-          border-color: rgba(255,255,255,0.18);
-          box-shadow: 0 12px 48px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+          border-color: rgba(255,255,255,0.22);
+          box-shadow: 0 16px 56px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.18), 0 0 80px rgba(99,102,241,0.12);
         }
         .hero-glass-badge {
-          background: rgba(255,255,255,0.08);
+          background: linear-gradient(135deg, rgba(99,102,241,0.2) 0%, rgba(139,92,246,0.15) 100%);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
-          border: 1px solid rgba(255,255,255,0.15);
-          box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+          border: 1px solid rgba(255,255,255,0.2);
+          box-shadow: 0 0 20px rgba(99,102,241,0.2), inset 0 1px 0 rgba(255,255,255,0.15);
           border-radius: 9999px;
-          padding: 0.35rem 0.9rem;
+          padding: 0.4rem 1rem;
           font-size: 0.7rem;
-          letter-spacing: 0.2em;
-          font-weight: 600;
-          color: rgba(255,255,255,0.95);
+          letter-spacing: 0.22em;
+          font-weight: 700;
+          color: rgba(255,255,255,0.98);
+          animation: hero-badge-glow 3s ease-in-out infinite;
         }
         .hero-carousel-frame {
           border-radius: 1.75rem;
           overflow: hidden;
-          border: 1px solid rgba(255,255,255,0.12);
-          box-shadow: 0 32px 64px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.06);
-          transition: box-shadow 0.5s ease, border-color 0.5s ease;
+          border: 1px solid rgba(255,255,255,0.14);
+          box-shadow: 0 36px 72px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.08), 0 0 80px rgba(0,0,0,0.2);
+          transition: box-shadow 0.5s ease, border-color 0.5s ease, transform 0.5s ease;
         }
         .hero-carousel-frame:hover {
-          border-color: rgba(255,255,255,0.15);
-          box-shadow: 0 40px 80px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.08);
+          border-color: rgba(255,255,255,0.2);
+          box-shadow: 0 44px 88px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.12);
+          transform: translateY(-2px);
         }
         .hero-cta-glass {
-          background: rgba(255,255,255,0.14);
+          background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,248,252,0.9) 100%);
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
-          border: 1px solid rgba(255,255,255,0.25);
-          box-shadow: 0 4px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.3);
+          border: 1px solid rgba(255,255,255,0.5);
+          box-shadow: 0 4px 24px rgba(0,0,0,0.15), 0 0 0 1px rgba(99,102,241,0.1), inset 0 1px 0 rgba(255,255,255,0.9);
           color: #0a0a0c;
-          font-weight: 600;
+          font-weight: 700;
+          letter-spacing: 0.04em;
           transition: transform 0.35s ease, box-shadow 0.35s ease, background 0.35s ease, border-color 0.35s ease;
+          animation: hero-cta-pulse 2.5s ease-in-out infinite;
         }
         .hero-cta-glass:hover {
-          background: rgba(255,255,255,0.28);
-          border-color: rgba(255,255,255,0.4);
-          box-shadow: 0 8px 28px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.5);
+          background: linear-gradient(135deg, #ffffff 0%, #f5f5fa 100%);
+          border-color: rgba(99,102,241,0.3);
+          box-shadow: 0 8px 32px rgba(99,102,241,0.2), 0 0 0 1px rgba(99,102,241,0.15), inset 0 1px 0 rgba(255,255,255,1);
           color: #0a0a0c;
-          transform: translateY(-3px);
+          transform: translateY(-4px) scale(1.02);
+          animation: none;
         }
         .hero-glass-orb {
           position: absolute;
@@ -256,11 +273,22 @@ export default function HomePageContent() {
           opacity: 0;
         }
         .home-hero-gradient-text {
-          background: linear-gradient(135deg, #ffffff 0%, #e8e8ee 35%, #d0d0dc 100%);
+          position: relative;
+          background: linear-gradient(120deg, #ffffff 0%, #f0f0f5 25%, #e0e0ec 50%, #d8d8e4 100%);
+          background-size: 200% auto;
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
           letter-spacing: -0.04em;
+          filter: drop-shadow(0 2px 12px rgba(0,0,0,0.25)) drop-shadow(0 0 40px rgba(255,255,255,0.08));
+        }
+        .home-hero-gradient-text::after {
+          content: '';
+          position: absolute;
+          left: 0; right: 0; bottom: -4px;
+          height: 2px;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+          border-radius: 2px;
         }
         .home-hero-content .home-hero-item { opacity: 0; animation: home-hero-in 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .home-hero-content .home-hero-item:nth-child(1) { animation-delay: 0.08s; }
@@ -422,15 +450,16 @@ export default function HomePageContent() {
       <section
         className="position-relative overflow-hidden rounded-4 mx-2 mx-md-3 mx-lg-5 mb-5 mb-lg-6 home-hero-section"
         style={{
-          background: 'linear-gradient(158deg, #060608 0%, #0c0c10 25%, #12121a 50%, #16161e 75%, #1a1a24 100%)',
+          background: 'linear-gradient(155deg, #050507 0%, #0a0a0e 20%, #0f0f14 40%, #14141c 60%, #18181f 80%, #1c1c26 100%)',
           minHeight: 'min(92vh, 700px)',
-          boxShadow: '0 28px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03)',
+          boxShadow: '0 32px 96px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04), 0 0 120px rgba(99,102,241,0.06)',
         }}
       >
         {/* Soft glass orbs — depth */}
-        <div className="hero-glass-orb" style={{ width: 320, height: 320, background: 'rgba(99,102,241,0.18)', top: '10%', left: '5%' }} aria-hidden />
-        <div className="hero-glass-orb" style={{ width: 240, height: 240, background: 'rgba(139,92,246,0.12)', bottom: '20%', right: '15%', animationDelay: '-4s' }} aria-hidden />
-        <div className="hero-glass-orb" style={{ width: 180, height: 180, background: 'rgba(255,255,255,0.04)', top: '50%', left: '30%', animationDelay: '-7s' }} aria-hidden />
+        <div className="hero-glass-orb" style={{ width: 360, height: 360, background: 'rgba(99,102,241,0.22)', top: '8%', left: '3%' }} aria-hidden />
+        <div className="hero-glass-orb" style={{ width: 280, height: 280, background: 'rgba(139,92,246,0.16)', bottom: '15%', right: '12%', animationDelay: '-4s' }} aria-hidden />
+        <div className="hero-glass-orb" style={{ width: 200, height: 200, background: 'rgba(255,255,255,0.06)', top: '48%', left: '28%', animationDelay: '-7s' }} aria-hidden />
+        <div className="hero-glass-orb" style={{ width: 120, height: 120, background: 'rgba(99,102,241,0.1)', top: '75%', left: '8%', animationDelay: '-2s' }} aria-hidden />
         {/* Gradient overlay for depth */}
         <div
           className="position-absolute top-0 start-0 end-0 bottom-0 rounded-4 home-hero-copy-wrap"
@@ -458,7 +487,7 @@ export default function HomePageContent() {
             <div className="home-hero-content position-relative" style={{ maxWidth: '100%' }}>
               <div
                 className="home-hero-item mb-3"
-                style={{ width: 40, height: 2, background: 'linear-gradient(90deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.08) 100%)', borderRadius: 2 }}
+                style={{ width: 56, height: 3, background: 'linear-gradient(90deg, rgba(99,102,241,0.9) 0%, rgba(139,92,246,0.7) 50%, rgba(255,255,255,0.2) 100%)', borderRadius: 3 }}
                 aria-hidden
               />
               <p className="home-hero-item hero-glass-badge text-uppercase mb-3 d-inline-block">
@@ -466,13 +495,13 @@ export default function HomePageContent() {
               </p>
               <h1
                 className="home-hero-item fw-bold mb-3 lh-tight home-hero-gradient-text"
-                style={{ letterSpacing: '-0.04em', fontSize: 'clamp(1.9rem, 4.8vw, 3rem)', lineHeight: 1.15 }}
+                style={{ letterSpacing: '-0.04em', fontSize: 'clamp(2.1rem, 5.2vw, 3.35rem)', lineHeight: 1.12 }}
               >
                 Quality first. Style that lasts.
               </h1>
               <p
                 className="home-hero-item mb-4 text-white"
-                style={{ fontSize: '1rem', opacity: 0.92, lineHeight: 1.65 }}
+                style={{ fontSize: '1.0625rem', opacity: 0.94, lineHeight: 1.6 }}
               >
                 Premium picks for every moment. {freeShippingText}.
               </p>
