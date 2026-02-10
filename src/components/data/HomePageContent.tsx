@@ -112,6 +112,9 @@ export default function HomePageContent() {
         @keyframes hero-progress {
           to { width: 100%; }
         }
+        .home-hero-copy-wrap { z-index: 10; pointer-events: auto; }
+        .home-hero-section .hero-carousel-frame,
+        .home-hero-section .home-hero-mesh { z-index: 0; }
         .hero-carousel-frame {
           border-radius: 1.25rem;
           overflow: hidden;
@@ -215,6 +218,38 @@ export default function HomePageContent() {
           boxShadow: '0 24px 80px rgba(0,0,0,0.35)',
         }}
       >
+        {/* Hero copy — left side (desktop) / overlay (mobile); above carousel */}
+        <div
+          className="position-absolute top-0 start-0 bottom-0 d-flex align-items-center rounded-4 px-3 px-md-4 px-lg-5 py-4 home-hero-copy-wrap"
+          style={{
+            width: '100%',
+            maxWidth: '100%',
+            background: 'linear-gradient(90deg, rgba(15,15,18,0.97) 0%, rgba(15,15,18,0.85) 45%, rgba(15,15,18,0.4) 70%, transparent 100%)',
+            zIndex: 10,
+          }}
+        >
+          <div className="home-hero-content" style={{ maxWidth: 'min(100%, 420px)' }}>
+            <p className="home-hero-item text-uppercase small mb-2 home-section-label text-white" style={{ letterSpacing: '0.2em', fontSize: '0.7rem', opacity: 0.9 }}>
+              New collection
+            </p>
+            <h1 className="home-hero-item h2 fw-bold mb-2 lh-tight home-hero-gradient-text" style={{ letterSpacing: '-0.03em', fontSize: 'clamp(1.75rem, 4vw, 2.5rem)' }}>
+              Welcome to OPAL
+            </h1>
+            <p className="home-hero-item mb-2 text-white" style={{ fontSize: '1.05rem', opacity: 0.95 }}>
+              Curated for every moment
+            </p>
+            <p className="home-hero-item small mb-3 text-white" style={{ fontSize: '0.95rem', opacity: 0.9 }}>
+              {freeShippingText}. Discover quality picks and shop with confidence.
+            </p>
+            <a
+              href="/shop/"
+              className="home-hero-item btn btn-light rounded-pill px-4 py-2 fw-semibold border-0 home-btn-pill"
+              style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.2)' }}
+            >
+              Shop now
+            </a>
+          </div>
+        </div>
         {/* Animated mesh + grain */}
         <div className="position-absolute top-0 start-0 end-0 bottom-0 rounded-4 home-hero-mesh pointer-events-none" aria-hidden />
         <div
@@ -265,73 +300,6 @@ export default function HomePageContent() {
               </div>
             ))}
             <div className="position-absolute bottom-0 start-0 end-0 p-3" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 100%)', pointerEvents: 'none' }} />
-          </div>
-        </div>
-        <div className="container position-relative py-10 py-lg-12">
-          <div className="row align-items-center">
-            <div className="col-lg-6 text-white home-hero-content">
-              <span
-                className="home-hero-item d-inline-block px-3 py-1 rounded-pill mb-3 text-uppercase home-section-label"
-                style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.95)' }}
-              >
-                New collection
-              </span>
-              <p className="home-hero-item text-uppercase small mb-2" style={{ letterSpacing: '0.18em', color: 'rgba(255,255,255,0.7)' }}>
-                Welcome to OPAL
-              </p>
-              <h1
-                className="home-hero-item display-4 fw-bold mb-3 lh-tight home-hero-gradient-text"
-                style={{ textShadow: 'none', lineHeight: '1.1', fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}
-              >
-                Curated for every moment
-              </h1>
-              <p className="home-hero-item lead mb-4 fs-5" style={{ color: 'rgba(255,255,255,0.88)', maxWidth: '28rem' }}>
-                {freeShippingText}. Discover quality picks and shop with confidence.
-              </p>
-              <a
-                href="/shop/"
-                className="home-hero-item btn btn-light btn-lg rounded-pill px-5 shadow fw-semibold border-0"
-                style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.02)';
-                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.2)';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.transform = '';
-                  e.currentTarget.style.boxShadow = '';
-                }}
-              >
-                Shop now
-              </a>
-              <div className="home-hero-item d-flex flex-column gap-3 mt-4 pt-2" role="tablist" aria-label="Hero slides">
-                <div className="d-flex align-items-center gap-3 flex-wrap">
-                  <div className="hero-progress-track flex-grow-1" style={{ maxWidth: '120px' }}>
-                    <div key={heroSlide} className="hero-progress-fill" />
-                  </div>
-                  <span className="small text-uppercase opacity-75" style={{ letterSpacing: '0.15em', fontSize: '0.7rem', color: '#fff' }}>
-                    {String(heroSlide + 1).padStart(2, '0')} / {String(heroCarouselImages.length).padStart(2, '0')}
-                  </span>
-                </div>
-                <div className="d-flex gap-2">
-                  {heroCarouselImages.map((_, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      role="tab"
-                      aria-selected={heroSlide === i}
-                      aria-label={`Slide ${i + 1}`}
-                      className="hero-dot-btn border-0 rounded-pill p-0 bg-white"
-                      style={{
-                        width: heroSlide === i ? 24 : 8,
-                        height: 8,
-                        opacity: heroSlide === i ? 1 : 0.45,
-                      }}
-                      onClick={() => setHeroSlide(i)}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
