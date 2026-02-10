@@ -12,7 +12,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className="navbar navbar-expand-lg blur border-radius-sm top-0 z-index-3 shadow position-sticky py-3 start-0 end-0">
+    <nav className="navbar navbar-expand-lg blur border-radius-sm sticky-top py-3 start-0 end-0 shadow" style={{ zIndex: 1030 }}>
       <div className="container px-1">
         <a className="navbar-brand font-weight-bolder ms-lg-0 " href="/">OPAL</a>
         <button className="navbar-toggler shadow-none ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navigation" aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation">

@@ -156,17 +156,88 @@ export default function HomePageContent() {
           0%, 100% { opacity: 0.6; }
           50% { opacity: 1; }
         }
+        @keyframes hero-glass-shine {
+          0% { opacity: 0; transform: translateX(-100%) skewX(-15deg); }
+          60% { opacity: 0.15; }
+          100% { opacity: 0; transform: translateX(200%) skewX(-15deg); }
+        }
+        @keyframes hero-orb-float {
+          0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+          50% { transform: translate(4%, -6%) scale(1.05); opacity: 0.6; }
+        }
         .home-hero-copy-wrap { z-index: 10; pointer-events: auto; }
         .home-hero-section .hero-carousel-frame,
         .home-hero-section .home-hero-mesh { z-index: 0; }
+        .hero-glass-panel {
+          background: rgba(255,255,255,0.06);
+          backdrop-filter: blur(24px) saturate(180%);
+          -webkit-backdrop-filter: blur(24px) saturate(180%);
+          border: 1px solid rgba(255,255,255,0.12);
+          box-shadow: 0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.1);
+          border-radius: 1.5rem;
+          position: relative;
+          overflow: hidden;
+          transition: box-shadow 0.5s ease, border-color 0.5s ease, background 0.5s ease;
+        }
+        .hero-glass-panel::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%, rgba(255,255,255,0.02) 100%);
+          pointer-events: none;
+          border-radius: inherit;
+        }
+        .hero-glass-panel:hover {
+          border-color: rgba(255,255,255,0.18);
+          box-shadow: 0 12px 48px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        .hero-glass-badge {
+          background: rgba(255,255,255,0.08);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid rgba(255,255,255,0.15);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+          border-radius: 9999px;
+          padding: 0.35rem 0.9rem;
+          font-size: 0.7rem;
+          letter-spacing: 0.2em;
+          font-weight: 600;
+          color: rgba(255,255,255,0.95);
+        }
         .hero-carousel-frame {
           border-radius: 1.75rem;
           overflow: hidden;
-          box-shadow: 0 32px 64px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.08);
-          transition: box-shadow 0.5s ease;
+          border: 1px solid rgba(255,255,255,0.12);
+          box-shadow: 0 32px 64px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.06);
+          transition: box-shadow 0.5s ease, border-color 0.5s ease;
         }
         .hero-carousel-frame:hover {
-          box-shadow: 0 40px 80px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.1);
+          border-color: rgba(255,255,255,0.15);
+          box-shadow: 0 40px 80px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        .hero-cta-glass {
+          background: rgba(255,255,255,0.14);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(255,255,255,0.25);
+          box-shadow: 0 4px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.3);
+          color: #0a0a0c;
+          font-weight: 600;
+          transition: transform 0.35s ease, box-shadow 0.35s ease, background 0.35s ease, border-color 0.35s ease;
+        }
+        .hero-cta-glass:hover {
+          background: rgba(255,255,255,0.28);
+          border-color: rgba(255,255,255,0.4);
+          box-shadow: 0 8px 28px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.5);
+          color: #0a0a0c;
+          transform: translateY(-3px);
+        }
+        .hero-glass-orb {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(60px);
+          pointer-events: none;
+          animation: hero-orb-float 12s ease-in-out infinite;
         }
         .hero-carousel-slide {
           transition: opacity 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -347,63 +418,79 @@ export default function HomePageContent() {
         .home-float-subtle { animation: home-float 5s ease-in-out infinite; }
         .home-section-reveal.in-view .home-product-card { opacity: 1; transform: translateY(0); }
       `}</style>
-      {/* Hero — modern, editorial */}
+      {/* Hero — premium glassmorphism */}
       <section
         className="position-relative overflow-hidden rounded-4 mx-2 mx-md-3 mx-lg-5 mb-5 mb-lg-6 home-hero-section"
         style={{
-          background: 'linear-gradient(155deg, #08080a 0%, #0f0f12 30%, #16161a 60%, #1c1c22 100%)',
-          minHeight: 'min(92vh, 680px)',
-          boxShadow: '0 24px 72px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.04)',
+          background: 'linear-gradient(158deg, #060608 0%, #0c0c10 25%, #12121a 50%, #16161e 75%, #1a1a24 100%)',
+          minHeight: 'min(92vh, 700px)',
+          boxShadow: '0 28px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03)',
         }}
       >
+        {/* Soft glass orbs — depth */}
+        <div className="hero-glass-orb" style={{ width: 320, height: 320, background: 'rgba(99,102,241,0.18)', top: '10%', left: '5%' }} aria-hidden />
+        <div className="hero-glass-orb" style={{ width: 240, height: 240, background: 'rgba(139,92,246,0.12)', bottom: '20%', right: '15%', animationDelay: '-4s' }} aria-hidden />
+        <div className="hero-glass-orb" style={{ width: 180, height: 180, background: 'rgba(255,255,255,0.04)', top: '50%', left: '30%', animationDelay: '-7s' }} aria-hidden />
+        {/* Gradient overlay for depth */}
         <div
-          className="position-absolute top-0 start-0 bottom-0 d-flex align-items-center rounded-4 home-hero-copy-wrap"
+          className="position-absolute top-0 start-0 end-0 bottom-0 rounded-4 home-hero-copy-wrap"
           style={{
             width: '100%',
             maxWidth: '100%',
-            background: 'linear-gradient(105deg, rgba(8,8,10,0.94) 0%, rgba(8,8,10,0.6) 40%, rgba(8,8,10,0.12) 68%, transparent 100%)',
+            background: 'linear-gradient(102deg, rgba(6,6,8,0.92) 0%, rgba(6,6,8,0.5) 38%, transparent 62%)',
             zIndex: 10,
-            padding: 'clamp(2rem, 5vw, 3rem) clamp(1.5rem, 4vw, 3.5rem)',
+            padding: 'clamp(2rem, 5vw, 3.25rem) clamp(1.5rem, 4vw, 4rem)',
+            pointerEvents: 'none',
+          }}
+        />
+        <div
+          className="position-absolute d-flex align-items-center rounded-4"
+          style={{
+            left: 'clamp(1.5rem, 4vw, 4rem)',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            zIndex: 11,
+            pointerEvents: 'auto',
+            maxWidth: 'min(100%, 480px)',
           }}
         >
-          <div className="home-hero-content" style={{ maxWidth: 'min(100%, 440px)' }}>
-            <div
-              className="home-hero-item home-hero-accent-line mb-3"
-              style={{ width: 48, height: 3, background: 'linear-gradient(90deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.15) 100%)', borderRadius: 2 }}
-              aria-hidden
-            />
-            <p
-              className="home-hero-item text-uppercase small mb-2 text-white"
-              style={{ letterSpacing: '0.2em', fontSize: '0.7rem', fontWeight: 600, opacity: 0.9 }}
-            >
-              New collection
-            </p>
-            <h1
-              className="home-hero-item fw-bold mb-3 lh-tight home-hero-gradient-text"
-              style={{ letterSpacing: '-0.04em', fontSize: 'clamp(2rem, 5vw, 3.1rem)', lineHeight: 1.12 }}
-            >
-              Quality first. Style that lasts.
-            </h1>
-            <p
-              className="home-hero-item mb-4 text-white"
-              style={{ fontSize: '1.0625rem', opacity: 0.9, lineHeight: 1.65 }}
-            >
-              Premium picks for every moment. {freeShippingText}.
-            </p>
-            <a
-              href="/shop/"
-              className="home-hero-item btn btn-light rounded-pill px-5 py-3 fw-semibold border-0 home-hero-cta"
-              style={{ boxShadow: '0 6px 20px rgba(0,0,0,0.25)', fontSize: '0.9375rem' }}
-            >
-              Shop now
-            </a>
+          <div className="hero-glass-panel p-4 p-md-5 position-relative">
+            <div className="home-hero-content position-relative" style={{ maxWidth: '100%' }}>
+              <div
+                className="home-hero-item mb-3"
+                style={{ width: 40, height: 2, background: 'linear-gradient(90deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.08) 100%)', borderRadius: 2 }}
+                aria-hidden
+              />
+              <p className="home-hero-item hero-glass-badge text-uppercase mb-3 d-inline-block">
+                New collection
+              </p>
+              <h1
+                className="home-hero-item fw-bold mb-3 lh-tight home-hero-gradient-text"
+                style={{ letterSpacing: '-0.04em', fontSize: 'clamp(1.9rem, 4.8vw, 3rem)', lineHeight: 1.15 }}
+              >
+                Quality first. Style that lasts.
+              </h1>
+              <p
+                className="home-hero-item mb-4 text-white"
+                style={{ fontSize: '1rem', opacity: 0.92, lineHeight: 1.65 }}
+              >
+                Premium picks for every moment. {freeShippingText}.
+              </p>
+              <a
+                href="/shop/"
+                className="home-hero-item btn rounded-pill px-5 py-3 hero-cta-glass border-0"
+                style={{ fontSize: '0.9375rem' }}
+              >
+                Shop now
+              </a>
+            </div>
           </div>
         </div>
         {/* Ambient mesh */}
         <div className="position-absolute top-0 start-0 end-0 bottom-0 rounded-4 home-hero-mesh pointer-events-none" aria-hidden />
         <div
           className="position-absolute top-0 start-0 end-0 bottom-0 rounded-4 pointer-events-none"
-          style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.8\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'0.12\'/%3E%3C/svg%3E")' }}
+          style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.8\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'0.08\'/%3E%3C/svg%3E")' }}
           aria-hidden
         />
         {/* Mobile: carousel background */}
