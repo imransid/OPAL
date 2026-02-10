@@ -4,17 +4,17 @@ interface Props {
   collection?: string;
   classList?: string;
   cta?: string;
+  productCount?: number;
 }
 
-
-export default function CardProduct({
+export default function CardCategory({
   thumb_src,
   title,
   collection,
   classList = "",
   cta,
+  productCount,
 }: Props) {
-
   const classBody = ((cta != null && cta !== "") ? "align-items-end d-flex" : "text-center w-100 pt-8");
 
   return (
@@ -33,15 +33,16 @@ export default function CardProduct({
           />
           <div className={`card-body ${classBody}`}>
             <div className="d-block mt-10">
-              <p className="text-white font-weight-bold mb-1">{collection}</p>
+              <p className="text-white font-weight-bold mb-1">{collection ?? title}</p>
               <h4 className="text-white font-weight-bolder">{title}</h4>
-              {/* {(cta != null) &&  */}
-              <a href="#" className="text-white text-sm font-weight-semibold mb-0">See products &#62;</a>
-              {/* } */}
+              {productCount != null && (
+                <p className="text-white text-sm opacity-90 mb-1">{productCount} Products</p>
+              )}
+              <span className="text-white text-sm font-weight-semibold mb-0">See products &#62;</span>
             </div>
           </div>
         </div>
       </a>
     </>
   );
-};
+}
