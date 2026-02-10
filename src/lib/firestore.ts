@@ -27,11 +27,24 @@ function omitUndefined<T extends Record<string, unknown>>(obj: T): Partial<T> {
 
 // --- Products ---
 
+function normalizeProduct(docData: Record<string, unknown>, id: string): Product {
+  const data = { id, ...docData } as Product & { createdAt?: unknown; updatedAt?: unknown };
+  const createdAt = data.createdAt;
+  const updatedAt = data.updatedAt;
+  if (createdAt != null && typeof createdAt === 'object' && 'toMillis' in createdAt && typeof (createdAt as { toMillis: () => number }).toMillis === 'function') {
+    data.createdAt = (createdAt as { toMillis: () => number }).toMillis();
+  }
+  if (updatedAt != null && typeof updatedAt === 'object' && 'toMillis' in updatedAt && typeof (updatedAt as { toMillis: () => number }).toMillis === 'function') {
+    data.updatedAt = (updatedAt as { toMillis: () => number }).toMillis();
+  }
+  return data as Product;
+}
+
 export async function getProducts(): Promise<Product[]> {
   const db = getDb();
   if (!db) return [];
   const snap = await getDocs(query(collection(db, PRODUCTS), orderBy('title')));
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Product));
+  return snap.docs.map((d) => normalizeProduct(d.data() as Record<string, unknown>, d.id));
 }
 
 export async function getProduct(id: string): Promise<Product | null> {
@@ -40,7 +53,7 @@ export async function getProduct(id: string): Promise<Product | null> {
   const ref = doc(db, PRODUCTS, id);
   const snap = await getDoc(ref);
   if (!snap.exists()) return null;
-  return { id: snap.id, ...snap.data() } as Product;
+  return normalizeProduct(snap.data() as Record<string, unknown>, snap.id);
 }
 
 export async function createProduct(data: Omit<Product, 'id'>): Promise<string> {

@@ -60,6 +60,11 @@ export interface Product {
   resource?: string;
   delivery?: ProductDelivery;
   status?: string;
+  /** For "New Arrivals" sort (set by Firestore, normalized to ms) */
+  createdAt?: number;
+  updatedAt?: number;
+  /** For "Best Sellers" sort (optional, set by admin or analytics) */
+  salesCount?: number;
 }
 
 export interface Category {

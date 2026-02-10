@@ -104,7 +104,7 @@ export default function HomePageContent() {
   }
 
   return (
-    <>
+    <div className="home-page-bg">
       <style>{`
         @media (prefers-reduced-motion: reduce) {
           *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
@@ -114,19 +114,27 @@ export default function HomePageContent() {
           to { opacity: 1; transform: translateY(0); }
         }
         @keyframes home-hero-in {
-          from { opacity: 0; transform: translateY(16px) scale(0.98); }
+          from { opacity: 0; transform: translateY(24px) scale(0.98); }
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
+        @keyframes home-hero-line {
+          from { opacity: 0; transform: scaleX(0); }
+          to { opacity: 1; transform: scaleX(1); }
+        }
         @keyframes home-mesh {
-          0%, 100% { opacity: 0.4; transform: scale(1) translate(0, 0); }
-          50% { opacity: 0.6; transform: scale(1.05) translate(2%, 2%); }
+          0%, 100% { opacity: 0.35; transform: scale(1) translate(0, 0); }
+          50% { opacity: 0.55; transform: scale(1.04) translate(1%, 1%); }
         }
         @keyframes hero-kenburns {
           0% { transform: scale(1) translate(0, 0); }
-          100% { transform: scale(1.08) translate(-2%, -1%); }
+          100% { transform: scale(1.06) translate(-1.5%, -0.5%); }
         }
         @keyframes hero-progress {
           to { width: 100%; }
+        }
+        @keyframes hero-pulse {
+          0%, 100% { opacity: 0.5; }
+          50% { opacity: 1; }
         }
         @keyframes home-float {
           0%, 100% { transform: translateY(0); }
@@ -148,57 +156,69 @@ export default function HomePageContent() {
         .home-hero-section .hero-carousel-frame,
         .home-hero-section .home-hero-mesh { z-index: 0; }
         .hero-carousel-frame {
-          border-radius: 1.25rem;
+          border-radius: 1.5rem;
           overflow: hidden;
-          box-shadow: 0 32px 64px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.08);
+          box-shadow: 0 24px 56px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.06);
         }
         .hero-carousel-slide {
-          transition: opacity 1.6s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: opacity 2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .hero-carousel-slide.active img {
-          animation: hero-kenburns 4.5s ease-out forwards;
+          animation: hero-kenburns 5s ease-out forwards;
         }
         .hero-carousel-slide:not(.active) img {
           transform: scale(1);
         }
         .hero-progress-track {
-          height: 3px;
-          background: rgba(255,255,255,0.25);
-          border-radius: 3px;
+          height: 2px;
+          background: rgba(255,255,255,0.2);
+          border-radius: 2px;
           overflow: hidden;
-          min-width: 80px;
+          min-width: 64px;
         }
         .hero-progress-fill {
           height: 100%;
           width: 0%;
-          background: linear-gradient(90deg, #fff 0%, rgba(255,255,255,0.9) 100%);
-          border-radius: 3px;
+          background: linear-gradient(90deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 100%);
+          border-radius: 2px;
           animation: hero-progress 4500ms linear forwards;
         }
         .hero-dot-btn {
-          transition: width 0.35s ease, opacity 0.35s ease, background 0.35s ease;
+          transition: width 0.3s ease, opacity 0.3s ease, background 0.3s ease;
         }
         .hero-dot-btn:hover { opacity: 1; }
+        .home-hero-accent-line {
+          transform-origin: left;
+          animation: home-hero-line 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.05s forwards;
+          opacity: 0;
+        }
         .home-hero-gradient-text {
-          background: linear-gradient(120deg, #fff 0%, #e8e8ed 45%, #b8b8c8 100%);
+          background: linear-gradient(135deg, #fff 0%, #e4e4eb 40%, #c4c4d4 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
         }
-        .home-hero-content .home-hero-item { opacity: 0; animation: home-hero-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-        .home-hero-content .home-hero-item:nth-child(1) { animation-delay: 0.1s; }
-        .home-hero-content .home-hero-item:nth-child(2) { animation-delay: 0.18s; }
-        .home-hero-content .home-hero-item:nth-child(3) { animation-delay: 0.26s; }
-        .home-hero-content .home-hero-item:nth-child(4) { animation-delay: 0.34s; }
+        .home-hero-content .home-hero-item { opacity: 0; animation: home-hero-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .home-hero-content .home-hero-item:nth-child(1) { animation-delay: 0.05s; }
+        .home-hero-content .home-hero-item:nth-child(2) { animation-delay: 0.12s; }
+        .home-hero-content .home-hero-item:nth-child(3) { animation-delay: 0.22s; }
+        .home-hero-content .home-hero-item:nth-child(4) { animation-delay: 0.32s; }
         .home-hero-content .home-hero-item:nth-child(5) { animation-delay: 0.42s; }
-        .home-hero-content .home-hero-item:nth-child(6) { animation-delay: 0.5s; }
-        .home-hero-content .home-hero-item:nth-child(7) { animation-delay: 0.58s; }
-        .home-hero-content .home-hero-item:nth-child(8) { animation-delay: 0.66s; }
-        .home-hero-content .home-hero-item:nth-child(9) { animation-delay: 0.74s; }
+        .home-hero-content .home-hero-item:nth-child(6) { animation-delay: 0.52s; }
+        .home-hero-content .home-hero-item:nth-child(7) { animation-delay: 0.62s; }
+        .home-hero-content .home-hero-item:nth-child(8) { animation-delay: 0.72s; }
+        .home-hero-content .home-hero-item:nth-child(9) { animation-delay: 0.82s; }
+        .home-hero-cta {
+          transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, background 0.3s ease;
+        }
+        .home-hero-cta:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 8px 28px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.15);
+        }
         .home-hero-mesh {
-          background: radial-gradient(ellipse 80% 50% at 20% 40%, rgba(120,119,198,0.15) 0%, transparent 50%),
-                    radial-gradient(ellipse 60% 40% at 80% 60%, rgba(99,102,241,0.08) 0%, transparent 50%);
-          animation: home-mesh 12s ease-in-out infinite;
+          background: radial-gradient(ellipse 70% 45% at 15% 50%, rgba(120,119,198,0.12) 0%, transparent 50%),
+                    radial-gradient(ellipse 50% 35% at 85% 50%, rgba(99,102,241,0.06) 0%, transparent 50%);
+          animation: home-mesh 14s ease-in-out infinite;
         }
         .home-glass {
           background: rgba(255,255,255,0.08);
@@ -279,99 +299,174 @@ export default function HomePageContent() {
           transform: translateY(-4px) scale(1.02);
           box-shadow: 0 20px 48px rgba(0,0,0,0.1);
         }
-        .home-btn-pill { transition: color 0.25s ease, background 0.25s ease, border-color 0.25s ease, transform 0.25s ease; }
+        .home-btn-pill { transition: color 0.25s ease, background 0.25s ease, border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease; }
         .home-btn-pill:hover { transform: translateY(-2px); }
+        .home-btn-dark-cool {
+          background: linear-gradient(135deg, #1a1a1f 0%, #2d2d35 100%);
+          border: none;
+          box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+          transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .home-btn-dark-cool:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(0,0,0,0.28);
+        }
+        .home-btn-outline-cool {
+          border-width: 2px;
+          transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, color 0.25s ease;
+        }
+        .home-btn-outline-cool:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        }
+        .home-section-title-wrap { position: relative; }
+        .home-section-title-wrap .home-title-accent {
+          display: inline-block;
+          width: 32px;
+          height: 3px;
+          border-radius: 2px;
+          background: linear-gradient(90deg, #1a1a1f 0%, #3d3d48 100%);
+          margin-bottom: 0.75rem;
+        }
+        .home-section-title-wrap.highlight .home-title-accent {
+          background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
+        }
+        .home-categories .card { overflow: hidden; }
+        .home-categories .card .full-background,
+        .home-categories .card img { transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+        .home-categories .card:hover .full-background,
+        .home-categories .card:hover img { transform: scale(1.06); }
+        .home-best-pill {
+          transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, color 0.25s ease;
+        }
+        .home-best-pill:hover { transform: translateY(-1px); }
+        .home-best-pill.active {
+          background: linear-gradient(135deg, #1a1a1f 0%, #2d2d35 100%);
+          color: #fff;
+          border-color: transparent;
+          box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+        }
+        .home-testimonial-quote {
+          border-left: 4px solid #6366f1;
+          padding-left: 1.25rem;
+        }
+        .home-page-bg {
+          background: #fafafa;
+          background-image: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(99,102,241,0.04) 0%, transparent 50%);
+        }
         .home-float-subtle { animation: home-float 4s ease-in-out infinite; }
         .home-section-reveal.in-view .home-product-card { opacity: 1; transform: translateY(0); }
       `}</style>
-      {/* Hero — modern, editorial */}
+      {/* Hero — clean, editorial */}
       <section
         className="position-relative overflow-hidden rounded-4 mx-2 mx-md-3 mx-lg-5 mb-5 mb-lg-6 home-hero-section"
         style={{
-          background: 'linear-gradient(145deg, #0f0f12 0%, #1c1c24 40%, #252530 100%)',
-          minHeight: 'min(88vh, 620px)',
-          boxShadow: '0 24px 80px rgba(0,0,0,0.35)',
+          background: 'linear-gradient(152deg, #0c0c0e 0%, #16161a 35%, #1e1e24 100%)',
+          minHeight: 'min(90vh, 640px)',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
         }}
       >
-        {/* Hero copy — gradient overlay only (no solid glass so carousel shows on right) */}
+        {/* Copy + gradient overlay */}
         <div
-          className="position-absolute top-0 start-0 bottom-0 d-flex align-items-center rounded-4 px-3 px-md-4 px-lg-5 py-4 home-hero-copy-wrap"
+          className="position-absolute top-0 start-0 bottom-0 d-flex align-items-center rounded-4 home-hero-copy-wrap"
           style={{
             width: '100%',
             maxWidth: '100%',
-            background: 'linear-gradient(105deg, rgba(15,15,18,0.88) 0%, rgba(15,15,18,0.6) 42%, rgba(15,15,18,0.15) 65%, transparent 100%)',
+            background: 'linear-gradient(108deg, rgba(12,12,14,0.92) 0%, rgba(12,12,14,0.55) 45%, rgba(12,12,14,0.08) 70%, transparent 100%)',
             zIndex: 10,
+            padding: 'clamp(1.5rem, 4vw, 2.5rem) clamp(1.25rem, 4vw, 3rem)',
           }}
         >
-          <div className="home-hero-content" style={{ maxWidth: 'min(100%, 440px)' }}>
-            <p className="home-hero-item text-uppercase small mb-2 home-section-label text-white" style={{ letterSpacing: '0.2em', fontSize: '0.7rem', opacity: 0.95 }}>
-              Best deal forever
+          <div className="home-hero-content" style={{ maxWidth: 'min(100%, 420px)' }}>
+            <div
+              className="home-hero-item home-hero-accent-line mb-3"
+              style={{ width: 40, height: 2, background: 'linear-gradient(90deg, rgba(255,255,255,0.5) 0%, transparent 100%)', borderRadius: 1 }}
+              aria-hidden
+            />
+            <p
+              className="home-hero-item text-uppercase small mb-2 text-white"
+              style={{ letterSpacing: '0.18em', fontSize: '0.6875rem', fontWeight: 600, opacity: 0.85 }}
+            >
+              New collection
             </p>
-            <h1 className="home-hero-item h2 fw-bold mb-2 lh-tight home-hero-gradient-text" style={{ letterSpacing: '-0.03em', fontSize: 'clamp(1.85rem, 4.2vw, 2.75rem)' }}>
-              Quality first & style that lasts
+            <h1
+              className="home-hero-item fw-bold mb-3 lh-tight home-hero-gradient-text"
+              style={{ letterSpacing: '-0.035em', fontSize: 'clamp(1.9rem, 4.5vw, 2.85rem)', lineHeight: 1.15 }}
+            >
+              Quality first. Style that lasts.
             </h1>
-            <p className="home-hero-item mb-3 text-white" style={{ fontSize: '1.05rem', opacity: 0.95, lineHeight: 1.5 }}>
-              Discover our collection of premium picks designed for every moment. {freeShippingText}.
+            <p
+              className="home-hero-item mb-4 text-white"
+              style={{ fontSize: '1rem', opacity: 0.88, lineHeight: 1.6 }}
+            >
+              Premium picks for every moment. {freeShippingText}.
             </p>
             <a
               href="/shop/"
-              className="home-hero-item btn btn-light rounded-pill px-4 py-2 fw-semibold border-0 home-btn-pill home-float-subtle"
-              style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.2)' }}
+              className="home-hero-item btn btn-light rounded-pill px-4 py-2 fw-semibold border-0 home-hero-cta"
+              style={{ boxShadow: '0 4px 16px rgba(0,0,0,0.2)', fontSize: '0.9375rem' }}
             >
-              Get it now
+              Shop now
             </a>
           </div>
         </div>
-        {/* Animated mesh + grain */}
+        {/* Ambient mesh */}
         <div className="position-absolute top-0 start-0 end-0 bottom-0 rounded-4 home-hero-mesh pointer-events-none" aria-hidden />
         <div
-          className="position-absolute top-0 start-0 end-0 bottom-0 opacity-20 rounded-4 pointer-events-none"
-          style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")' }}
+          className="position-absolute top-0 start-0 end-0 bottom-0 rounded-4 pointer-events-none"
+          style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.8\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'0.12\'/%3E%3C/svg%3E")' }}
           aria-hidden
         />
-        {/* Mobile: full-bleed carousel with frame */}
-        <div className="position-absolute top-0 end-0 bottom-0 start-0 d-lg-none rounded-4 px-2 py-3 d-flex align-items-end" aria-hidden>
-          <div className="hero-carousel-frame position-absolute top-0 start-0 end-0 bottom-0 m-2" style={{ bottom: '0.5rem', top: '0.5rem', left: '0.5rem', right: '0.5rem' }}>
+        {/* Mobile: carousel background */}
+        <div className="position-absolute top-0 end-0 bottom-0 start-0 d-lg-none rounded-4 d-flex align-items-end" aria-hidden>
+          <div className="hero-carousel-frame position-absolute m-2" style={{ bottom: '0.75rem', top: '0.75rem', left: '0.75rem', right: '0.75rem' }}>
             {heroCarouselImages.map((src, i) => (
               <div
                 key={`m-${src}`}
                 className={`hero-carousel-slide position-absolute top-0 start-0 end-0 bottom-0 ${heroSlide === i ? 'active' : ''}`}
-                style={{ opacity: heroSlide === i ? 0.32 : 0, zIndex: heroSlide === i ? 1 : 0 }}
+                style={{ opacity: heroSlide === i ? 0.28 : 0, zIndex: heroSlide === i ? 1 : 0 }}
               >
-                <img
-                  src={src}
-                  alt=""
-                  className="position-absolute top-0 start-0 end-0 bottom-0 h-100 w-100"
-                  style={{ objectFit: 'cover' }}
-                  loading={i === 0 ? 'eager' : 'lazy'}
-                />
+                <img src={src} alt="" className="position-absolute top-0 start-0 end-0 bottom-0 h-100 w-100" style={{ objectFit: 'cover' }} loading={i === 0 ? 'eager' : 'lazy'} />
               </div>
             ))}
           </div>
         </div>
-        {/* Desktop: right-side carousel panel with Ken Burns */}
+        {/* Desktop: right carousel + indicators */}
         <div
           className="position-absolute top-0 end-0 bottom-0 d-none d-lg-flex align-items-center justify-content-center"
-          style={{ width: '50%', paddingRight: 'clamp(1rem, 3vw, 2rem)' }}
+          style={{ width: '52%', paddingRight: 'clamp(1.25rem, 3.5vw, 2.5rem)' }}
           aria-hidden
         >
-          <div className="hero-carousel-frame position-relative" style={{ width: '92%', maxWidth: '520px', height: '85%', maxHeight: '480px' }}>
-            {heroCarouselImages.map((src, i) => (
-              <div
-                key={`d-${src}`}
-                className={`hero-carousel-slide position-absolute top-0 start-0 end-0 bottom-0 ${heroSlide === i ? 'active' : ''}`}
-                style={{ opacity: heroSlide === i ? 1 : 0, zIndex: heroSlide === i ? 1 : 0 }}
-              >
-                <img
-                  src={src}
-                  alt=""
-                  className="position-absolute top-0 start-0 end-0 bottom-0 h-100 w-100"
-                  style={{ objectFit: 'cover' }}
-                  loading={i === 0 ? 'eager' : 'lazy'}
+          <div className="position-relative d-flex flex-column align-items-center gap-3" style={{ width: '90%', maxWidth: '480px', height: '82%', maxHeight: '460px' }}>
+            <div className="hero-carousel-frame position-relative flex-grow-1 w-100 rounded-4 overflow-hidden">
+              {heroCarouselImages.map((src, i) => (
+                <div
+                  key={`d-${src}`}
+                  className={`hero-carousel-slide position-absolute top-0 start-0 end-0 bottom-0 ${heroSlide === i ? 'active' : ''}`}
+                  style={{ opacity: heroSlide === i ? 1 : 0, zIndex: heroSlide === i ? 1 : 0 }}
+                >
+                  <img src={src} alt="" className="position-absolute top-0 start-0 end-0 bottom-0 h-100 w-100" style={{ objectFit: 'cover' }} loading={i === 0 ? 'eager' : 'lazy'} />
+                </div>
+              ))}
+              <div className="position-absolute bottom-0 start-0 end-0 p-3" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.25) 0%, transparent 100%)', pointerEvents: 'none' }} />
+            </div>
+            <div className="d-flex align-items-center gap-2 flex-shrink-0">
+              {heroCarouselImages.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  className="hero-dot-btn border-0 rounded-pill p-0 bg-white"
+                  style={{
+                    width: heroSlide === i ? 20 : 8,
+                    height: 8,
+                    opacity: heroSlide === i ? 1 : 0.4,
+                    background: heroSlide === i ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.4)',
+                  }}
+                  aria-label={`Slide ${i + 1}`}
+                  onClick={() => setHeroSlide(i)}
                 />
-              </div>
-            ))}
-            <div className="position-absolute bottom-0 start-0 end-0 p-3" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 100%)', pointerEvents: 'none' }} />
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -385,7 +480,10 @@ export default function HomePageContent() {
         >
           <div className="container">
             <div className="text-center mb-5">
-              <h2 className="h3 fw-bold mb-2" style={{ letterSpacing: '-0.02em' }}>Featured Categories</h2>
+              <div className="home-section-title-wrap d-inline-block text-start">
+                <div className="home-title-accent" />
+                <h2 className="h3 fw-bold mb-2" style={{ letterSpacing: '-0.025em' }}>Featured Categories</h2>
+              </div>
               <p className="text-body-secondary mb-0 mx-auto" style={{ maxWidth: '32rem' }}>
                 Browse our most popular categories and find the perfect picks for your home.
               </p>
@@ -403,7 +501,7 @@ export default function HomePageContent() {
               ))}
             </div>
             <div className="text-center mt-4">
-              <a href="/shop/" className="btn btn-outline-dark rounded-pill fw-semibold home-btn-pill">
+              <a href="/shop/" className="btn btn-outline-dark rounded-pill fw-semibold home-btn-pill home-btn-outline-cool">
                 View all categories
               </a>
             </div>
@@ -411,7 +509,7 @@ export default function HomePageContent() {
         </section>
       )}
 
-      {/* 2. New Arrivals — Martup-style */}
+      {/* 2. New Arrivals */}
       {featuredProducts.length > 0 && (
         <section
           ref={setSectionRef(2)}
@@ -421,7 +519,10 @@ export default function HomePageContent() {
         >
           <div className="container">
             <div className="text-center mb-5">
-              <h2 className="h3 fw-bold mb-2" style={{ letterSpacing: '-0.02em' }}>New Arrivals</h2>
+              <div className="home-section-title-wrap highlight d-inline-block text-start">
+                <div className="home-title-accent" />
+                <h2 className="h3 fw-bold mb-2" style={{ letterSpacing: '-0.025em' }}>New Arrivals</h2>
+              </div>
               <p className="text-body-secondary mb-0 mx-auto" style={{ maxWidth: '32rem' }}>
                 Discover our latest collection designed for modern living.
               </p>
@@ -446,7 +547,7 @@ export default function HomePageContent() {
               ))}
             </div>
             <div className="text-center mt-4">
-              <a href="/shop/" className="btn btn-dark rounded-pill px-4 fw-semibold home-btn-pill">
+              <a href="/shop/" className="btn btn-dark rounded-pill px-4 fw-semibold home-btn-pill home-btn-dark-cool">
                 View all products
               </a>
             </div>
@@ -454,7 +555,7 @@ export default function HomePageContent() {
         </section>
       )}
 
-      {/* 3. Best Sellers — tabs + grid Martup-style */}
+      {/* 3. Best Sellers */}
       <section
         ref={setSectionRef(3)}
         data-section-index={3}
@@ -462,7 +563,10 @@ export default function HomePageContent() {
       >
         <div className="container">
           <div className="text-center mb-4">
-            <h2 className="h3 fw-bold mb-2" style={{ letterSpacing: '-0.02em' }}>Best Sellers</h2>
+            <div className="home-section-title-wrap d-inline-block text-start">
+              <div className="home-title-accent" />
+              <h2 className="h3 fw-bold mb-2" style={{ letterSpacing: '-0.025em' }}>Best Sellers</h2>
+            </div>
             <p className="text-body-secondary mb-0 mx-auto" style={{ maxWidth: '32rem' }}>
               Our most popular products based on sales and customer satisfaction.
             </p>
@@ -473,7 +577,7 @@ export default function HomePageContent() {
                 key={cat.id}
                 type="button"
                 onClick={() => setBestSellerFilter(cat.id)}
-                className={`btn rounded-pill fw-semibold home-btn-pill ${bestSellerFilter === cat.id ? 'btn-dark' : 'btn-outline-dark'}`}
+                className={`btn rounded-pill fw-semibold home-best-pill ${bestSellerFilter === cat.id ? 'active btn-dark' : 'btn-outline-dark'}`}
               >
                 {cat.title}
               </button>
@@ -499,14 +603,14 @@ export default function HomePageContent() {
             ))}
           </div>
           <div className="text-center mt-4">
-            <a href="/shop/" className="btn btn-outline-dark rounded-pill fw-semibold home-btn-pill">
+            <a href="/shop/" className="btn btn-outline-dark rounded-pill fw-semibold home-btn-pill home-btn-outline-cool">
               View all
             </a>
           </div>
         </div>
       </section>
 
-      {/* 4. Incentives — glass cards */}
+      {/* 4. Incentives */}
       <section
         ref={setSectionRef(4)}
         data-section-index={4}
@@ -551,7 +655,7 @@ export default function HomePageContent() {
         </div>
       </section>
 
-      {/* 5. Testimonials — Martup-style */}
+      {/* 5. Testimonials */}
       <section
         ref={setSectionRef(5)}
         data-section-index={5}
@@ -560,14 +664,17 @@ export default function HomePageContent() {
       >
         <div className="container">
           <div className="text-center mb-4">
-            <h2 className="h3 fw-bold mb-2" style={{ letterSpacing: '-0.02em' }}>What our customers say</h2>
+            <div className="home-section-title-wrap highlight d-inline-block text-start">
+              <div className="home-title-accent" />
+              <h2 className="h3 fw-bold mb-2" style={{ letterSpacing: '-0.025em' }}>What our customers say</h2>
+            </div>
             <p className="text-body-secondary mb-0 mx-auto" style={{ maxWidth: '32rem' }}>
               Read testimonials from satisfied customers about their experience with OPAL.
             </p>
           </div>
           <div className="row justify-content-center">
             <div className="col-12 col-lg-8">
-              <blockquote className="home-glass-card rounded-4 p-4 p-lg-5 mb-0 text-center border-0">
+              <blockquote className="home-glass-card home-testimonial-quote rounded-4 p-4 p-lg-5 mb-0 text-start border-0">
                 <p className="fs-5 text-body mb-3 fst-italic">
                   &ldquo;The quality and style from OPAL is exceptional. I always find something that fits my taste and the delivery is fast.&rdquo;
                 </p>
@@ -581,6 +688,6 @@ export default function HomePageContent() {
         </div>
       </section>
 
-    </>
+    </div>
   );
 }

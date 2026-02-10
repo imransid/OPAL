@@ -10,7 +10,7 @@ function getCategoryFromUrl(): string | null {
   return new URLSearchParams(window.location.search).get('category');
 }
 
-type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc';
+type SortOption = 'default' | 'new-arrivals' | 'best-sellers' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc';
 
 export default function ShopFirebaseContent() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -57,6 +57,10 @@ export default function ShopFirebaseContent() {
       list = products.filter((p) => p.categoryId === selectedCategoryId);
     }
     switch (sort) {
+      case 'new-arrivals':
+        return [...list].sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
+      case 'best-sellers':
+        return [...list].sort((a, b) => (b.salesCount ?? 0) - (a.salesCount ?? 0));
       case 'price-asc':
         return [...list].sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
       case 'price-desc':
@@ -190,11 +194,14 @@ export default function ShopFirebaseContent() {
               <select
                 id="shop-sort"
                 className="form-select form-select-sm rounded-pill border"
-                style={{ minWidth: '140px', maxWidth: '100%' }}
+                style={{ minWidth: '160px', maxWidth: '100%' }}
                 value={sort}
                 onChange={(e) => setSort(e.target.value as SortOption)}
+                aria-label="Sort products"
               >
                 <option value="default">Default</option>
+                <option value="new-arrivals">New Arrivals</option>
+                <option value="best-sellers">Best Sellers</option>
                 <option value="price-asc">Price: Low to High</option>
                 <option value="price-desc">Price: High to Low</option>
                 <option value="name-asc">Name: A–Z</option>
