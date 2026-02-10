@@ -5,12 +5,19 @@ import { toImageSrc } from '../../lib/image-utils';
 import CardProduct from '../products/cardProduct';
 import type { Product, Category } from '../../lib/types';
 
+const SORT_OPTIONS = ['default', 'new-arrivals', 'best-sellers', 'price-asc', 'price-desc', 'name-asc', 'name-desc'] as const;
+type SortOption = (typeof SORT_OPTIONS)[number];
+
 function getCategoryFromUrl(): string | null {
   if (typeof window === 'undefined') return null;
   return new URLSearchParams(window.location.search).get('category');
 }
 
-type SortOption = 'default' | 'new-arrivals' | 'best-sellers' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc';
+function getSortFromUrl(): SortOption | null {
+  if (typeof window === 'undefined') return null;
+  const s = new URLSearchParams(window.location.search).get('sort');
+  return s && SORT_OPTIONS.includes(s as SortOption) ? (s as SortOption) : null;
+}
 
 export default function ShopFirebaseContent() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -28,24 +35,34 @@ export default function ShopFirebaseContent() {
       if (fromUrl && c.some((cat) => cat.id === fromUrl)) {
         setSelectedCategoryId(fromUrl);
       }
+      const sortFromUrl = getSortFromUrl();
+      if (sortFromUrl) setSort(sortFromUrl);
       setLoading(false);
     });
   }, []);
 
-  const updateUrl = (categoryId: string | null) => {
+  const updateUrl = (updates: { categoryId?: string | null; sort?: SortOption }) => {
     if (typeof window === 'undefined') return;
     const url = new URL(window.location.href);
-    if (categoryId) {
-      url.searchParams.set('category', categoryId);
-    } else {
-      url.searchParams.delete('category');
+    if (updates.categoryId !== undefined) {
+      if (updates.categoryId) url.searchParams.set('category', updates.categoryId);
+      else url.searchParams.delete('category');
+    }
+    if (updates.sort !== undefined) {
+      if (updates.sort && updates.sort !== 'default') url.searchParams.set('sort', updates.sort);
+      else url.searchParams.delete('sort');
     }
     window.history.replaceState({}, '', url.toString());
   };
 
   const setCategory = (id: string | null) => {
     setSelectedCategoryId(id);
-    updateUrl(id);
+    updateUrl({ categoryId: id });
+  };
+
+  const setSortAndUrl = (value: SortOption) => {
+    setSort(value);
+    updateUrl({ sort: value });
   };
 
   const topLevel = useMemo(() => categories.filter((c) => !c.parentId), [categories]);
@@ -196,7 +213,7 @@ export default function ShopFirebaseContent() {
                 className="form-select form-select-sm rounded-pill border"
                 style={{ minWidth: '160px', maxWidth: '100%' }}
                 value={sort}
-                onChange={(e) => setSort(e.target.value as SortOption)}
+                onChange={(e) => setSortAndUrl(e.target.value as SortOption)}
                 aria-label="Sort products"
               >
                 <option value="default">Default</option>

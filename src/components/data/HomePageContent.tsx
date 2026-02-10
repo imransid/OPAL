@@ -32,7 +32,7 @@ export default function HomePageContent() {
           if (i != null && entry.isIntersecting) setVisible((v) => ({ ...v, [Number(i)]: true }));
         });
       },
-      { threshold: 0.06, rootMargin: '0px 0px -30px 0px' }
+      { threshold: 0.08, rootMargin: '0px 0px -60px 0px' }
     );
     const timer = setTimeout(() => {
       sectionRefs.current.forEach((el) => el && observer.observe(el));
@@ -109,302 +109,291 @@ export default function HomePageContent() {
         @media (prefers-reduced-motion: reduce) {
           *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
         }
-        @keyframes home-fade-up {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
         @keyframes home-hero-in {
-          from { opacity: 0; transform: translateY(24px) scale(0.98); }
+          from { opacity: 0; transform: translateY(32px) scale(0.98); }
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
         @keyframes home-hero-line {
           from { opacity: 0; transform: scaleX(0); }
           to { opacity: 1; transform: scaleX(1); }
         }
+        @keyframes home-hero-line-underline {
+          from { opacity: 0; transform: scaleX(0); }
+          to { opacity: 1; transform: scaleX(1); }
+        }
         @keyframes home-mesh {
-          0%, 100% { opacity: 0.35; transform: scale(1) translate(0, 0); }
-          50% { opacity: 0.55; transform: scale(1.04) translate(1%, 1%); }
+          0%, 100% { opacity: 0.3; transform: scale(1) translate(0, 0); }
+          50% { opacity: 0.5; transform: scale(1.05) translate(1%, 1%); }
         }
         @keyframes hero-kenburns {
           0% { transform: scale(1) translate(0, 0); }
-          100% { transform: scale(1.06) translate(-1.5%, -0.5%); }
+          100% { transform: scale(1.08) translate(-2%, -1%); }
         }
         @keyframes hero-progress {
           to { width: 100%; }
         }
-        @keyframes hero-pulse {
-          0%, 100% { opacity: 0.5; }
-          50% { opacity: 1; }
-        }
-        @keyframes home-float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-6px); }
-        }
         @keyframes home-shine {
-          0% { transform: translateX(-100%) skewX(-12deg); opacity: 0.4; }
+          0% { transform: translateX(-100%) skewX(-12deg); opacity: 0.35; }
           100% { transform: translateX(200%) skewX(-12deg); opacity: 0; }
         }
         @keyframes home-scale-in {
-          from { opacity: 0; transform: scale(0.92); }
+          from { opacity: 0; transform: scale(0.94); }
           to { opacity: 1; transform: scale(1); }
         }
-        @keyframes home-border-glow {
-          0%, 100% { box-shadow: 0 0 0 1px rgba(255,255,255,0.15), 0 8px 32px rgba(0,0,0,0.12); }
-          50% { box-shadow: 0 0 0 1px rgba(255,255,255,0.25), 0 8px 32px rgba(0,0,0,0.12), 0 0 40px rgba(255,255,255,0.03); }
+        @keyframes home-reveal-blur {
+          from { opacity: 0; transform: translateY(24px); filter: blur(8px); }
+          to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+        @keyframes home-title-underline {
+          from { transform: scaleX(0); }
+          to { transform: scaleX(1); }
+        }
+        @keyframes home-float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px); }
+        }
+        @keyframes home-glow-pulse {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 1; }
         }
         .home-hero-copy-wrap { z-index: 10; pointer-events: auto; }
         .home-hero-section .hero-carousel-frame,
         .home-hero-section .home-hero-mesh { z-index: 0; }
         .hero-carousel-frame {
-          border-radius: 1.5rem;
+          border-radius: 1.75rem;
           overflow: hidden;
-          box-shadow: 0 24px 56px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.06);
+          box-shadow: 0 32px 64px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.08);
+          transition: box-shadow 0.5s ease;
+        }
+        .hero-carousel-frame:hover {
+          box-shadow: 0 40px 80px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.1);
         }
         .hero-carousel-slide {
-          transition: opacity 2s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: opacity 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         .hero-carousel-slide.active img {
-          animation: hero-kenburns 5s ease-out forwards;
+          animation: hero-kenburns 6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
-        .hero-carousel-slide:not(.active) img {
-          transform: scale(1);
-        }
-        .hero-progress-track {
-          height: 2px;
-          background: rgba(255,255,255,0.2);
-          border-radius: 2px;
-          overflow: hidden;
-          min-width: 64px;
-        }
-        .hero-progress-fill {
-          height: 100%;
-          width: 0%;
-          background: linear-gradient(90deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 100%);
-          border-radius: 2px;
-          animation: hero-progress 4500ms linear forwards;
-        }
+        .hero-carousel-slide:not(.active) img { transform: scale(1); }
         .hero-dot-btn {
-          transition: width 0.3s ease, opacity 0.3s ease, background 0.3s ease;
+          transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease, background 0.3s ease;
         }
         .hero-dot-btn:hover { opacity: 1; }
         .home-hero-accent-line {
           transform-origin: left;
-          animation: home-hero-line 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.05s forwards;
+          animation: home-hero-line 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
           opacity: 0;
         }
         .home-hero-gradient-text {
-          background: linear-gradient(135deg, #fff 0%, #e4e4eb 40%, #c4c4d4 100%);
+          background: linear-gradient(135deg, #ffffff 0%, #e8e8ee 35%, #d0d0dc 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
+          letter-spacing: -0.04em;
         }
-        .home-hero-content .home-hero-item { opacity: 0; animation: home-hero-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-        .home-hero-content .home-hero-item:nth-child(1) { animation-delay: 0.05s; }
-        .home-hero-content .home-hero-item:nth-child(2) { animation-delay: 0.12s; }
-        .home-hero-content .home-hero-item:nth-child(3) { animation-delay: 0.22s; }
-        .home-hero-content .home-hero-item:nth-child(4) { animation-delay: 0.32s; }
-        .home-hero-content .home-hero-item:nth-child(5) { animation-delay: 0.42s; }
-        .home-hero-content .home-hero-item:nth-child(6) { animation-delay: 0.52s; }
-        .home-hero-content .home-hero-item:nth-child(7) { animation-delay: 0.62s; }
-        .home-hero-content .home-hero-item:nth-child(8) { animation-delay: 0.72s; }
-        .home-hero-content .home-hero-item:nth-child(9) { animation-delay: 0.82s; }
+        .home-hero-content .home-hero-item { opacity: 0; animation: home-hero-in 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .home-hero-content .home-hero-item:nth-child(1) { animation-delay: 0.08s; }
+        .home-hero-content .home-hero-item:nth-child(2) { animation-delay: 0.16s; }
+        .home-hero-content .home-hero-item:nth-child(3) { animation-delay: 0.28s; }
+        .home-hero-content .home-hero-item:nth-child(4) { animation-delay: 0.38s; }
+        .home-hero-content .home-hero-item:nth-child(5) { animation-delay: 0.48s; }
+        .home-hero-content .home-hero-item:nth-child(6) { animation-delay: 0.58s; }
+        .home-hero-content .home-hero-item:nth-child(7) { animation-delay: 0.68s; }
+        .home-hero-content .home-hero-item:nth-child(8) { animation-delay: 0.78s; }
+        .home-hero-content .home-hero-item:nth-child(9) { animation-delay: 0.88s; }
         .home-hero-cta {
-          transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, background 0.3s ease;
+          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, background 0.35s ease;
         }
         .home-hero-cta:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 8px 28px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.15);
+          transform: translateY(-4px);
+          box-shadow: 0 12px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.2);
         }
         .home-hero-mesh {
-          background: radial-gradient(ellipse 70% 45% at 15% 50%, rgba(120,119,198,0.12) 0%, transparent 50%),
-                    radial-gradient(ellipse 50% 35% at 85% 50%, rgba(99,102,241,0.06) 0%, transparent 50%);
-          animation: home-mesh 14s ease-in-out infinite;
-        }
-        .home-glass {
-          background: rgba(255,255,255,0.08);
-          backdrop-filter: blur(20px) saturate(180%);
-          -webkit-backdrop-filter: blur(20px) saturate(180%);
-          border: 1px solid rgba(255,255,255,0.12);
-          box-shadow: 0 8px 32px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.08);
+          background: radial-gradient(ellipse 70% 50% at 20% 40%, rgba(99,102,241,0.08) 0%, transparent 50%),
+                    radial-gradient(ellipse 50% 40% at 80% 60%, rgba(139,92,246,0.06) 0%, transparent 50%);
+          animation: home-mesh 16s ease-in-out infinite;
         }
         .home-glass-card {
-          background: rgba(255,255,255,0.65);
-          backdrop-filter: blur(20px) saturate(160%);
-          -webkit-backdrop-filter: blur(20px) saturate(160%);
-          border: 1px solid rgba(255,255,255,0.7);
-          box-shadow: 0 4px 24px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9);
-          transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease, border-color 0.4s ease, background 0.4s ease;
+          background: rgba(255,255,255,0.72);
+          backdrop-filter: blur(24px) saturate(160%);
+          -webkit-backdrop-filter: blur(24px) saturate(160%);
+          border: 1px solid rgba(255,255,255,0.8);
+          box-shadow: 0 4px 24px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.95);
+          transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.5s ease, border-color 0.5s ease, background 0.5s ease;
         }
         .home-glass-card:hover {
-          transform: translateY(-8px);
-          background: rgba(255,255,255,0.78);
-          border-color: rgba(255,255,255,0.95);
-          box-shadow: 0 24px 48px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,1);
+          transform: translateY(-10px);
+          background: rgba(255,255,255,0.88);
+          border-color: rgba(255,255,255,0.98);
+          box-shadow: 0 28px 56px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,1);
         }
-        .home-glass-card:hover .home-incentive-icon { transform: scale(1.1); }
-        .home-incentive-icon { transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .home-glass-card:hover .home-incentive-icon { transform: scale(1.08) rotate(-2deg); }
+        .home-incentive-icon { transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .home-section-reveal {
           opacity: 0;
-          transform: translateY(28px);
-          transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1), transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+          transform: translateY(36px);
+          transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .home-section-reveal.in-view {
           opacity: 1;
           transform: translateY(0);
         }
-        .home-section-reveal.in-view .home-stagger-1 { animation: home-scale-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-        .home-section-reveal.in-view .home-stagger-2 { animation: home-scale-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.08s forwards; }
-        .home-section-reveal.in-view .home-stagger-3 { animation: home-scale-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.16s forwards; }
+        .home-section-reveal.in-view .home-section-head .home-title-accent {
+          animation: home-title-underline 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .home-section-reveal.in-view .home-stagger-1 { animation: home-scale-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards; }
+        .home-section-reveal.in-view .home-stagger-2 { animation: home-scale-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards; }
+        .home-section-reveal.in-view .home-stagger-3 { animation: home-scale-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards; }
         .home-section-reveal .home-stagger-1, .home-section-reveal .home-stagger-2, .home-section-reveal .home-stagger-3 { opacity: 0; }
-        .home-product-card { opacity: 0; transform: translateY(20px); transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
-        .home-section-reveal.in-view .home-product-card:nth-child(1) { opacity: 1; transform: translateY(0); transition-delay: 0.05s; }
-        .home-section-reveal.in-view .home-product-card:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: 0.1s; }
-        .home-section-reveal.in-view .home-product-card:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 0.15s; }
-        .home-section-reveal.in-view .home-product-card:nth-child(4) { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
-        .home-section-reveal.in-view .home-product-card:nth-child(5) { opacity: 1; transform: translateY(0); transition-delay: 0.25s; }
-        .home-section-reveal.in-view .home-product-card:nth-child(6) { opacity: 1; transform: translateY(0); transition-delay: 0.3s; }
-        .home-section-reveal.in-view .home-product-card:nth-child(7) { opacity: 1; transform: translateY(0); transition-delay: 0.35s; }
-        .home-section-reveal.in-view .home-product-card:nth-child(8) { opacity: 1; transform: translateY(0); transition-delay: 0.4s; }
-        .home-best-sellers-block {
-          transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s ease;
+        .home-product-card {
+          opacity: 0;
+          transform: translateY(24px);
+          border-radius: 1rem;
+          transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
         }
-        .home-best-sellers-block:hover {
-          transform: translateY(-10px);
-          box-shadow: 0 32px 64px rgba(0,0,0,0.12);
+        .home-product-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 20px 40px rgba(0,0,0,0.08);
         }
+        .home-section-reveal.in-view .home-product-card:nth-child(1) { opacity: 1; transform: translateY(0); transition-delay: 0.06s; }
+        .home-section-reveal.in-view .home-product-card:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: 0.12s; }
+        .home-section-reveal.in-view .home-product-card:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 0.18s; }
+        .home-section-reveal.in-view .home-product-card:nth-child(4) { opacity: 1; transform: translateY(0); transition-delay: 0.24s; }
+        .home-section-reveal.in-view .home-product-card:nth-child(5) { opacity: 1; transform: translateY(0); transition-delay: 0.3s; }
+        .home-section-reveal.in-view .home-product-card:nth-child(6) { opacity: 1; transform: translateY(0); transition-delay: 0.36s; }
+        .home-section-reveal.in-view .home-product-card:nth-child(7) { opacity: 1; transform: translateY(0); transition-delay: 0.42s; }
+        .home-section-reveal.in-view .home-product-card:nth-child(8) { opacity: 1; transform: translateY(0); transition-delay: 0.48s; }
         .home-best-sellers-block .home-shine-wrap { position: relative; overflow: hidden; }
         .home-best-sellers-block .home-shine-wrap::after {
           content: '';
           position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-          background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.15) 45%, transparent 55%);
+          background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.2) 45%, transparent 55%);
           transform: translateX(-100%);
           pointer-events: none;
         }
         .home-best-sellers-block:hover .home-shine-wrap::after {
-          animation: home-shine 0.7s ease-out forwards;
+          animation: home-shine 0.8s ease-out forwards;
         }
-        .home-section-label { letter-spacing: 0.2em; font-size: 0.7rem; font-weight: 700; }
-        .home-cta-glass {
-          background: rgba(255,255,255,0.06);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-          border: 1px solid rgba(255,255,255,0.1);
-          box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
-        }
-        .home-cta-glow { box-shadow: 0 0 80px rgba(255,255,255,0.06); }
         .home-categories .card {
-          transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease;
+          transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s ease;
+          border-radius: 1.25rem;
+          overflow: hidden;
+          min-height: 280px;
         }
         .home-categories .card:hover {
-          transform: translateY(-4px) scale(1.02);
-          box-shadow: 0 20px 48px rgba(0,0,0,0.1);
+          transform: translateY(-8px) scale(1.02);
+          box-shadow: 0 24px 56px rgba(0,0,0,0.12);
         }
-        .home-btn-pill { transition: color 0.25s ease, background 0.25s ease, border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease; }
-        .home-btn-pill:hover { transform: translateY(-2px); }
+        .home-categories .card .full-background,
+        .home-categories .card img { transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
+        .home-categories .card:hover .full-background,
+        .home-categories .card:hover img { transform: scale(1.08); }
+        .home-btn-pill { transition: color 0.3s ease, background 0.3s ease, border-color 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease; }
+        .home-btn-pill:hover { transform: translateY(-3px); }
         .home-btn-dark-cool {
-          background: linear-gradient(135deg, #1a1a1f 0%, #2d2d35 100%);
+          background: linear-gradient(135deg, #0f0f12 0%, #1a1a1f 50%, #252530 100%);
           border: none;
-          box-shadow: 0 4px 14px rgba(0,0,0,0.2);
-          transition: transform 0.25s ease, box-shadow 0.25s ease;
+          box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+          transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
         }
         .home-btn-dark-cool:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 24px rgba(0,0,0,0.28);
+          transform: translateY(-3px);
+          box-shadow: 0 12px 32px rgba(0,0,0,0.3);
         }
         .home-btn-outline-cool {
           border-width: 2px;
-          transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, color 0.25s ease;
+          transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, background 0.3s ease, color 0.3s ease;
         }
         .home-btn-outline-cool:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+          transform: translateY(-3px);
+          box-shadow: 0 8px 24px rgba(0,0,0,0.06);
         }
         .home-section-title-wrap { position: relative; }
         .home-section-title-wrap .home-title-accent {
-          display: inline-block;
-          width: 32px;
-          height: 3px;
-          border-radius: 2px;
-          background: linear-gradient(90deg, #1a1a1f 0%, #3d3d48 100%);
-          margin-bottom: 0.75rem;
+          display: block;
+          width: 40px;
+          height: 4px;
+          border-radius: 3px;
+          background: linear-gradient(90deg, #0f0f12 0%, #2d2d35 100%);
+          margin-bottom: 0.875rem;
+          transform-origin: left;
         }
         .home-section-title-wrap.highlight .home-title-accent {
           background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
         }
-        .home-categories .card { overflow: hidden; }
-        .home-categories .card .full-background,
-        .home-categories .card img { transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
-        .home-categories .card:hover .full-background,
-        .home-categories .card:hover img { transform: scale(1.06); }
         .home-best-pill {
-          transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, color 0.25s ease;
+          transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, background 0.3s ease, color 0.3s ease;
         }
-        .home-best-pill:hover { transform: translateY(-1px); }
+        .home-best-pill:hover { transform: translateY(-2px); }
         .home-best-pill.active {
-          background: linear-gradient(135deg, #1a1a1f 0%, #2d2d35 100%);
+          background: linear-gradient(135deg, #0f0f12 0%, #1a1a1f 100%);
           color: #fff;
           border-color: transparent;
-          box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+          box-shadow: 0 6px 20px rgba(0,0,0,0.2);
         }
         .home-testimonial-quote {
           border-left: 4px solid #6366f1;
-          padding-left: 1.25rem;
+          padding-left: 1.5rem;
+          transition: box-shadow 0.4s ease, transform 0.4s ease;
+        }
+        .home-testimonial-quote:hover {
+          box-shadow: 0 16px 48px rgba(0,0,0,0.06);
         }
         .home-page-bg {
-          background: #fafafa;
-          background-image: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(99,102,241,0.04) 0%, transparent 50%);
+          background: #f8f9fa;
+          background-image: radial-gradient(ellipse 100% 60% at 50% -10%, rgba(99,102,241,0.035) 0%, transparent 55%),
+                            radial-gradient(ellipse 80% 40% at 80% 100%, rgba(139,92,246,0.02) 0%, transparent 50%);
         }
-        .home-float-subtle { animation: home-float 4s ease-in-out infinite; }
+        .home-float-subtle { animation: home-float 5s ease-in-out infinite; }
         .home-section-reveal.in-view .home-product-card { opacity: 1; transform: translateY(0); }
       `}</style>
-      {/* Hero — clean, editorial */}
+      {/* Hero — modern, editorial */}
       <section
         className="position-relative overflow-hidden rounded-4 mx-2 mx-md-3 mx-lg-5 mb-5 mb-lg-6 home-hero-section"
         style={{
-          background: 'linear-gradient(152deg, #0c0c0e 0%, #16161a 35%, #1e1e24 100%)',
-          minHeight: 'min(90vh, 640px)',
-          boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+          background: 'linear-gradient(155deg, #08080a 0%, #0f0f12 30%, #16161a 60%, #1c1c22 100%)',
+          minHeight: 'min(92vh, 680px)',
+          boxShadow: '0 24px 72px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.04)',
         }}
       >
-        {/* Copy + gradient overlay */}
         <div
           className="position-absolute top-0 start-0 bottom-0 d-flex align-items-center rounded-4 home-hero-copy-wrap"
           style={{
             width: '100%',
             maxWidth: '100%',
-            background: 'linear-gradient(108deg, rgba(12,12,14,0.92) 0%, rgba(12,12,14,0.55) 45%, rgba(12,12,14,0.08) 70%, transparent 100%)',
+            background: 'linear-gradient(105deg, rgba(8,8,10,0.94) 0%, rgba(8,8,10,0.6) 40%, rgba(8,8,10,0.12) 68%, transparent 100%)',
             zIndex: 10,
-            padding: 'clamp(1.5rem, 4vw, 2.5rem) clamp(1.25rem, 4vw, 3rem)',
+            padding: 'clamp(2rem, 5vw, 3rem) clamp(1.5rem, 4vw, 3.5rem)',
           }}
         >
-          <div className="home-hero-content" style={{ maxWidth: 'min(100%, 420px)' }}>
+          <div className="home-hero-content" style={{ maxWidth: 'min(100%, 440px)' }}>
             <div
               className="home-hero-item home-hero-accent-line mb-3"
-              style={{ width: 40, height: 2, background: 'linear-gradient(90deg, rgba(255,255,255,0.5) 0%, transparent 100%)', borderRadius: 1 }}
+              style={{ width: 48, height: 3, background: 'linear-gradient(90deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.15) 100%)', borderRadius: 2 }}
               aria-hidden
             />
             <p
               className="home-hero-item text-uppercase small mb-2 text-white"
-              style={{ letterSpacing: '0.18em', fontSize: '0.6875rem', fontWeight: 600, opacity: 0.85 }}
+              style={{ letterSpacing: '0.2em', fontSize: '0.7rem', fontWeight: 600, opacity: 0.9 }}
             >
               New collection
             </p>
             <h1
               className="home-hero-item fw-bold mb-3 lh-tight home-hero-gradient-text"
-              style={{ letterSpacing: '-0.035em', fontSize: 'clamp(1.9rem, 4.5vw, 2.85rem)', lineHeight: 1.15 }}
+              style={{ letterSpacing: '-0.04em', fontSize: 'clamp(2rem, 5vw, 3.1rem)', lineHeight: 1.12 }}
             >
               Quality first. Style that lasts.
             </h1>
             <p
               className="home-hero-item mb-4 text-white"
-              style={{ fontSize: '1rem', opacity: 0.88, lineHeight: 1.6 }}
+              style={{ fontSize: '1.0625rem', opacity: 0.9, lineHeight: 1.65 }}
             >
               Premium picks for every moment. {freeShippingText}.
             </p>
             <a
               href="/shop/"
-              className="home-hero-item btn btn-light rounded-pill px-4 py-2 fw-semibold border-0 home-hero-cta"
-              style={{ boxShadow: '0 4px 16px rgba(0,0,0,0.2)', fontSize: '0.9375rem' }}
+              className="home-hero-item btn btn-light rounded-pill px-5 py-3 fw-semibold border-0 home-hero-cta"
+              style={{ boxShadow: '0 6px 20px rgba(0,0,0,0.25)', fontSize: '0.9375rem' }}
             >
               Shop now
             </a>
@@ -476,26 +465,27 @@ export default function HomePageContent() {
         <section
           ref={setSectionRef(1)}
           data-section-index={1}
-          className={`py-5 py-lg-6 home-categories home-section-reveal ${visible[1] ? 'in-view' : ''}`}
+          className={`py-6 py-lg-7 home-categories home-section-reveal ${visible[1] ? 'in-view' : ''}`}
         >
           <div className="container">
-            <div className="text-center mb-5">
+            <div className="text-center mb-5 home-section-head">
               <div className="home-section-title-wrap d-inline-block text-start">
                 <div className="home-title-accent" />
-                <h2 className="h3 fw-bold mb-2" style={{ letterSpacing: '-0.025em' }}>Featured Categories</h2>
+                <h2 className="h3 fw-bold mb-2" style={{ letterSpacing: '-0.03em' }}>Featured Categories</h2>
               </div>
-              <p className="text-body-secondary mb-0 mx-auto" style={{ maxWidth: '32rem' }}>
-                Browse our most popular categories and find the perfect picks for your home.
+              <p className="text-body-secondary mb-0 mx-auto" style={{ maxWidth: '28rem', fontSize: '1rem' }}>
+                Browse our most popular categories and find the perfect picks.
               </p>
             </div>
-            <div className="row g-3 g-lg-4">
+            <div className="row g-3 g-lg-4 align-items-stretch">
               {displayCategories.map((cat) => (
-                <div key={cat.id} className="col-6 col-lg-3">
+                <div key={cat.id} className="col-6 col-lg-3 d-flex">
                   <CardCategory
                     thumb_src={cat.thumb_src}
                     title={cat.title}
                     collection={cat.collection}
                     productCount={productCountByCategory[cat.id]}
+                    categoryId={cat.id}
                   />
                 </div>
               ))}
@@ -514,16 +504,16 @@ export default function HomePageContent() {
         <section
           ref={setSectionRef(2)}
           data-section-index={2}
-          className={`py-5 py-lg-6 home-section-reveal ${visible[2] ? 'in-view' : ''}`}
-          style={{ background: 'linear-gradient(180deg, #f8f9fa 0%, #f1f3f5 50%, #fff 100%)' }}
+          className={`py-6 py-lg-7 home-section-reveal ${visible[2] ? 'in-view' : ''}`}
+          style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f8f9fa 45%, #f1f3f5 100%)' }}
         >
           <div className="container">
-            <div className="text-center mb-5">
+            <div className="text-center mb-5 home-section-head">
               <div className="home-section-title-wrap highlight d-inline-block text-start">
                 <div className="home-title-accent" />
-                <h2 className="h3 fw-bold mb-2" style={{ letterSpacing: '-0.025em' }}>New Arrivals</h2>
+                <h2 className="h3 fw-bold mb-2" style={{ letterSpacing: '-0.03em' }}>New Arrivals</h2>
               </div>
-              <p className="text-body-secondary mb-0 mx-auto" style={{ maxWidth: '32rem' }}>
+              <p className="text-body-secondary mb-0 mx-auto" style={{ maxWidth: '28rem', fontSize: '1rem' }}>
                 Discover our latest collection designed for modern living.
               </p>
             </div>
@@ -547,8 +537,8 @@ export default function HomePageContent() {
               ))}
             </div>
             <div className="text-center mt-4">
-              <a href="/shop/" className="btn btn-dark rounded-pill px-4 fw-semibold home-btn-pill home-btn-dark-cool">
-                View all products
+              <a href="/shop/?sort=new-arrivals" className="btn btn-dark rounded-pill px-4 fw-semibold home-btn-pill home-btn-dark-cool">
+                View all New Arrivals
               </a>
             </div>
           </div>
@@ -559,15 +549,15 @@ export default function HomePageContent() {
       <section
         ref={setSectionRef(3)}
         data-section-index={3}
-        className={`py-5 py-lg-6 home-section-reveal ${visible[3] ? 'in-view' : ''}`}
+        className={`py-6 py-lg-7 home-section-reveal ${visible[3] ? 'in-view' : ''}`}
       >
         <div className="container">
-          <div className="text-center mb-4">
+          <div className="text-center mb-5 home-section-head">
             <div className="home-section-title-wrap d-inline-block text-start">
               <div className="home-title-accent" />
-              <h2 className="h3 fw-bold mb-2" style={{ letterSpacing: '-0.025em' }}>Best Sellers</h2>
+              <h2 className="h3 fw-bold mb-2" style={{ letterSpacing: '-0.03em' }}>Best Sellers</h2>
             </div>
-            <p className="text-body-secondary mb-0 mx-auto" style={{ maxWidth: '32rem' }}>
+            <p className="text-body-secondary mb-0 mx-auto" style={{ maxWidth: '28rem', fontSize: '1rem' }}>
               Our most popular products based on sales and customer satisfaction.
             </p>
           </div>
@@ -603,8 +593,8 @@ export default function HomePageContent() {
             ))}
           </div>
           <div className="text-center mt-4">
-            <a href="/shop/" className="btn btn-outline-dark rounded-pill fw-semibold home-btn-pill home-btn-outline-cool">
-              View all
+            <a href="/shop/?sort=best-sellers" className="btn btn-outline-dark rounded-pill fw-semibold home-btn-pill home-btn-outline-cool">
+              View all Best Sellers
             </a>
           </div>
         </div>
@@ -614,7 +604,7 @@ export default function HomePageContent() {
       <section
         ref={setSectionRef(4)}
         data-section-index={4}
-        className={`py-5 py-lg-6 home-section-reveal ${visible[4] ? 'in-view' : ''}`}
+        className={`py-6 py-lg-7 home-section-reveal ${visible[4] ? 'in-view' : ''}`}
       >
         <div className="container">
           <div className="row g-3 g-md-4">
@@ -659,16 +649,16 @@ export default function HomePageContent() {
       <section
         ref={setSectionRef(5)}
         data-section-index={5}
-        className={`py-5 py-lg-6 home-section-reveal ${visible[5] ? 'in-view' : ''}`}
-        style={{ background: 'linear-gradient(180deg, #fff 0%, #f8f9fa 100%)' }}
+        className={`py-6 py-lg-7 home-section-reveal ${visible[5] ? 'in-view' : ''}`}
+        style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%)' }}
       >
         <div className="container">
-          <div className="text-center mb-4">
+          <div className="text-center mb-5 home-section-head">
             <div className="home-section-title-wrap highlight d-inline-block text-start">
               <div className="home-title-accent" />
-              <h2 className="h3 fw-bold mb-2" style={{ letterSpacing: '-0.025em' }}>What our customers say</h2>
+              <h2 className="h3 fw-bold mb-2" style={{ letterSpacing: '-0.03em' }}>What our customers say</h2>
             </div>
-            <p className="text-body-secondary mb-0 mx-auto" style={{ maxWidth: '32rem' }}>
+            <p className="text-body-secondary mb-0 mx-auto" style={{ maxWidth: '28rem', fontSize: '1rem' }}>
               Read testimonials from satisfied customers about their experience with OPAL.
             </p>
           </div>

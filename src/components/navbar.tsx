@@ -44,7 +44,7 @@ const Navbar = () => {
                 <i className="bi bi-cart3 me-1" aria-hidden="true"></i>
                 Cart
                 {cartCount > 0 && (
-                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark" style={{ fontSize: '0.65rem' }}>
+                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark" style={{ fontSize: '0.65rem', color: 'tomato' }}>
                     {cartCount > 99 ? '99+' : cartCount}
                   </span>
                 )}

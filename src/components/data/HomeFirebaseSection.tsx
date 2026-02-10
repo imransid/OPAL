@@ -43,6 +43,7 @@ export default function HomeFirebaseSection() {
                     thumb_src={category.thumb_src}
                     title={category.title}
                     collection={category.collection}
+                    categoryId={category.id}
                   />
                 </div>
               ))
