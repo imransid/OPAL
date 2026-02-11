@@ -13,6 +13,8 @@ export default function HomePageContent() {
   const sectionRefs = useRef<(HTMLElement | null)[]>([]);
   const [visible, setVisible] = useState<Record<number, boolean>>({});
   const setSectionRef = (i: number) => (el: HTMLElement | null) => { sectionRefs.current[i] = el; };
+  const [heroSlide, setHeroSlide] = useState(0);
+  const [bestSellerFilter, setBestSellerFilter] = useState<string>('all');
 
   useEffect(() => {
     Promise.all([getProducts(), getCategories(), getStoreSettings()]).then(([p, c, s]) => {
@@ -32,13 +34,25 @@ export default function HomePageContent() {
           if (i != null && entry.isIntersecting) setVisible((v) => ({ ...v, [Number(i)]: true }));
         });
       },
-      { threshold: 0.08, rootMargin: '0px 0px -60px 0px' }
+      { threshold: 0.06, rootMargin: '0px 0px -40px 0px' }
     );
     const timer = setTimeout(() => {
       sectionRefs.current.forEach((el) => el && observer.observe(el));
     }, 50);
     return () => { clearTimeout(timer); observer.disconnect(); };
   }, [loading]);
+
+  const heroImages = [
+    '/images/opal1.jpg',
+    '/images/opal2.jpg',
+    '/images/opal3.jpeg',
+    '/images/opal4.jpg',
+    '/images/opal5.jpg',
+  ];
+  useEffect(() => {
+    const t = setInterval(() => setHeroSlide((s) => (s + 1) % heroImages.length), 5000);
+    return () => clearInterval(t);
+  }, [heroImages.length]);
 
   const currency = settings.currency ?? '৳';
   const freeThreshold = settings.freeShippingThreshold;
@@ -49,37 +63,10 @@ export default function HomePageContent() {
 
   const inStockProducts = products.filter((p) => p.stock !== false);
   const featuredProducts = inStockProducts.slice(0, 8);
-  // Prefer nested (sub-)categories that have images, then any category with image, then fill up to 4
   const nestedWithImage = categories.filter((c) => c.parentId && c.thumb_src);
   const topWithImage = categories.filter((c) => !c.parentId && c.thumb_src);
   const rest = categories.filter((c) => !nestedWithImage.includes(c) && !topWithImage.includes(c));
   const displayCategories = [...nestedWithImage, ...topWithImage, ...rest].slice(0, 4);
-  const heroImage =
-    displayCategories[0]?.thumb_src ||
-    inStockProducts[0]?.thumb_src ||
-    '/images/suit-3.jpg';
-
-  // Hero carousel: opal1 & opal2
-  const heroCarouselImages = [
-    '/images/opal1.jpg',
-    '/images/opal2.jpg',
-    '/images/opal3.jpeg',
-    '/images/opal4.jpg',
-    '/images/opal5.jpg',
-    '/images/opal6.jpg',
-    '/images/opal7.jpg',
-    '/images/opal8.jpg',
-    '/images/opal9.jpg',
-  ];
-  const [heroSlide, setHeroSlide] = useState(0);
-  const [bestSellerFilter, setBestSellerFilter] = useState<string>('all');
-
-  useEffect(() => {
-    const t = setInterval(() => {
-      setHeroSlide((s) => (s + 1) % heroCarouselImages.length);
-    }, 4500);
-    return () => clearInterval(t);
-  }, [heroCarouselImages.length]);
 
   const productCountByCategory: Record<string, number> = {};
   categories.forEach((c) => {
@@ -94,9 +81,9 @@ export default function HomePageContent() {
 
   if (loading) {
     return (
-      <div className="min-vh-50 d-flex align-items-center justify-content-center py-12">
+      <div className="home-loading d-flex align-items-center justify-content-center" style={{ minHeight: '50vh' }}>
         <div className="text-center">
-          <div className="spinner-border text-dark mb-2" role="status" />
+          <div className="spinner-border text-dark mb-2" role="status" aria-label="Loading" />
           <p className="text-body-secondary small mb-0">Loading...</p>
         </div>
       </div>
@@ -104,538 +91,563 @@ export default function HomePageContent() {
   }
 
   return (
-    <div className="home-page-bg">
+    <div className="home-page">
       <style>{`
         @media (prefers-reduced-motion: reduce) {
-          *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+          .home-page *, .home-page *::before, .home-page *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+          }
         }
-        @keyframes home-hero-in {
-          from { opacity: 0; transform: translateY(32px) scale(0.98); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
+        .home-page {
+          background: linear-gradient(180deg, #f8f7fc 0%, #f0eef8 30%, #fafafa 100%);
         }
-        @keyframes home-hero-line {
-          from { opacity: 0; transform: scaleX(0); }
-          to { opacity: 1; transform: scaleX(1); }
-        }
-        @keyframes home-hero-line-underline {
-          from { opacity: 0; transform: scaleX(0); }
-          to { opacity: 1; transform: scaleX(1); }
-        }
-        @keyframes home-mesh {
-          0%, 100% { opacity: 0.3; transform: scale(1) translate(0, 0); }
-          50% { opacity: 0.5; transform: scale(1.05) translate(1%, 1%); }
-        }
-        @keyframes hero-kenburns {
-          0% { transform: scale(1) translate(0, 0); }
-          100% { transform: scale(1.08) translate(-2%, -1%); }
-        }
-        @keyframes hero-progress {
-          to { width: 100%; }
-        }
-        @keyframes home-shine {
-          0% { transform: translateX(-100%) skewX(-12deg); opacity: 0.35; }
-          100% { transform: translateX(200%) skewX(-12deg); opacity: 0; }
-        }
-        @keyframes home-scale-in {
-          from { opacity: 0; transform: scale(0.94); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        @keyframes home-reveal-blur {
-          from { opacity: 0; transform: translateY(24px); filter: blur(8px); }
-          to { opacity: 1; transform: translateY(0); filter: blur(0); }
-        }
-        @keyframes home-title-underline {
-          from { transform: scaleX(0); }
-          to { transform: scaleX(1); }
-        }
-        @keyframes home-float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-8px); }
-        }
-        @keyframes home-glow-pulse {
-          0%, 100% { opacity: 0.6; }
-          50% { opacity: 1; }
-        }
-        @keyframes hero-glass-shine {
-          0% { opacity: 0; transform: translateX(-100%) skewX(-15deg); }
-          60% { opacity: 0.15; }
-          100% { opacity: 0; transform: translateX(200%) skewX(-15deg); }
-        }
-        @keyframes hero-orb-float {
-          0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
-          50% { transform: translate(4%, -6%) scale(1.05); opacity: 0.6; }
-        }
-        @keyframes hero-badge-glow {
-          0%, 100% { box-shadow: 0 0 20px rgba(99,102,241,0.2), inset 0 1px 0 rgba(255,255,255,0.15); }
-          50% { box-shadow: 0 0 28px rgba(99,102,241,0.35), inset 0 1px 0 rgba(255,255,255,0.2); }
-        }
-        @keyframes hero-headline-shine {
-          0% { background-position: 200% center; }
-          100% { background-position: -200% center; }
-        }
-        @keyframes hero-cta-pulse {
-          0%, 100% { box-shadow: 0 4px 24px rgba(255,255,255,0.2), inset 0 1px 0 rgba(255,255,255,0.35); }
-          50% { box-shadow: 0 6px 32px rgba(255,255,255,0.3), inset 0 1px 0 rgba(255,255,255,0.45); }
-        }
-        .home-hero-copy-wrap { z-index: 10; pointer-events: auto; }
-        .home-hero-section .hero-carousel-frame,
-        .home-hero-section .home-hero-mesh { z-index: 0; }
-        .hero-glass-panel {
-          background: linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%);
-          backdrop-filter: blur(28px) saturate(180%);
-          -webkit-backdrop-filter: blur(28px) saturate(180%);
-          border: 1px solid rgba(255,255,255,0.15);
-          box-shadow: 0 12px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.12), 0 0 60px rgba(99,102,241,0.08);
-          border-radius: 1.5rem;
+        /* —— Hero —— */
+        .home-hero {
           position: relative;
+          min-height: min(75vh, 520px);
+          display: flex;
+          align-items: center;
           overflow: hidden;
-          transition: box-shadow 0.5s ease, border-color 0.5s ease, background 0.5s ease;
+          background: linear-gradient(145deg, #08080a 0%, #0f0f14 50%, #14141a 100%);
         }
-        .hero-glass-panel::before {
-          content: '';
+        @media (min-width: 768px) {
+          .home-hero { min-height: min(88vh, 680px); }
+        }
+        .home-hero-bg {
           position: absolute;
-          top: 0; left: 0; right: 0; bottom: 0;
-          background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%, rgba(255,255,255,0.02) 100%);
-          pointer-events: none;
-          border-radius: inherit;
+          inset: 0;
         }
-        .hero-glass-panel:hover {
-          border-color: rgba(255,255,255,0.22);
-          box-shadow: 0 16px 56px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.18), 0 0 80px rgba(99,102,241,0.12);
-        }
-        .hero-glass-badge {
-          background: linear-gradient(135deg, rgba(99,102,241,0.2) 0%, rgba(139,92,246,0.15) 100%);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-          border: 1px solid rgba(255,255,255,0.2);
-          box-shadow: 0 0 20px rgba(99,102,241,0.2), inset 0 1px 0 rgba(255,255,255,0.15);
-          border-radius: 9999px;
-          padding: 0.4rem 1rem;
-          font-size: 0.7rem;
-          letter-spacing: 0.22em;
-          font-weight: 700;
-          color: rgba(255,255,255,0.98);
-          animation: hero-badge-glow 3s ease-in-out infinite;
-        }
-        .hero-carousel-frame {
-          border-radius: 1.75rem;
-          overflow: hidden;
-          border: 1px solid rgba(255,255,255,0.14);
-          box-shadow: 0 36px 72px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.08), 0 0 80px rgba(0,0,0,0.2);
-          transition: box-shadow 0.5s ease, border-color 0.5s ease, transform 0.5s ease;
-        }
-        .hero-carousel-frame:hover {
-          border-color: rgba(255,255,255,0.2);
-          box-shadow: 0 44px 88px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.12);
-          transform: translateY(-2px);
-        }
-        .hero-cta-glass {
-          background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,248,252,0.9) 100%);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border: 1px solid rgba(255,255,255,0.5);
-          box-shadow: 0 4px 24px rgba(0,0,0,0.15), 0 0 0 1px rgba(99,102,241,0.1), inset 0 1px 0 rgba(255,255,255,0.9);
-          color: #0a0a0c;
-          font-weight: 700;
-          letter-spacing: 0.04em;
-          transition: transform 0.35s ease, box-shadow 0.35s ease, background 0.35s ease, border-color 0.35s ease;
-          animation: hero-cta-pulse 2.5s ease-in-out infinite;
-        }
-        .hero-cta-glass:hover {
-          background: linear-gradient(135deg, #ffffff 0%, #f5f5fa 100%);
-          border-color: rgba(99,102,241,0.3);
-          box-shadow: 0 8px 32px rgba(99,102,241,0.2), 0 0 0 1px rgba(99,102,241,0.15), inset 0 1px 0 rgba(255,255,255,1);
-          color: #0a0a0c;
-          transform: translateY(-4px) scale(1.02);
-          animation: none;
-        }
-        .hero-glass-orb {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(60px);
-          pointer-events: none;
-          animation: hero-orb-float 12s ease-in-out infinite;
-        }
-        .hero-carousel-slide {
-          transition: opacity 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-        .hero-carousel-slide.active img {
-          animation: hero-kenburns 6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-        }
-        .hero-carousel-slide:not(.active) img { transform: scale(1); }
-        .hero-dot-btn {
-          transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease, background 0.3s ease;
-        }
-        .hero-dot-btn:hover { opacity: 1; }
-        .home-hero-accent-line {
-          transform-origin: left;
-          animation: home-hero-line 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+        .home-hero-bg img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center;
           opacity: 0;
+          transition: opacity 1.4s ease;
         }
-        .home-hero-gradient-text {
-          position: relative;
-          background: linear-gradient(120deg, #ffffff 0%, #f0f0f5 25%, #e0e0ec 50%, #d8d8e4 100%);
-          background-size: 200% auto;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          letter-spacing: -0.04em;
-          filter: drop-shadow(0 2px 12px rgba(0,0,0,0.25)) drop-shadow(0 0 40px rgba(255,255,255,0.08));
-        }
-        .home-hero-gradient-text::after {
-          content: '';
+        .home-hero-bg img.active { opacity: 0.5; }
+        .home-hero-overlay {
           position: absolute;
-          left: 0; right: 0; bottom: -4px;
-          height: 2px;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
-          border-radius: 2px;
+          inset: 0;
+          background: linear-gradient(105deg, #0a0a0e 0%, rgba(10,10,14,0.92) 40%, rgba(10,10,14,0.4) 65%, transparent 85%);
         }
-        .home-hero-content .home-hero-item { opacity: 0; animation: home-hero-in 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .home-hero-content .home-hero-item:nth-child(1) { animation-delay: 0.08s; }
-        .home-hero-content .home-hero-item:nth-child(2) { animation-delay: 0.16s; }
-        .home-hero-content .home-hero-item:nth-child(3) { animation-delay: 0.28s; }
-        .home-hero-content .home-hero-item:nth-child(4) { animation-delay: 0.38s; }
-        .home-hero-content .home-hero-item:nth-child(5) { animation-delay: 0.48s; }
-        .home-hero-content .home-hero-item:nth-child(6) { animation-delay: 0.58s; }
-        .home-hero-content .home-hero-item:nth-child(7) { animation-delay: 0.68s; }
-        .home-hero-content .home-hero-item:nth-child(8) { animation-delay: 0.78s; }
-        .home-hero-content .home-hero-item:nth-child(9) { animation-delay: 0.88s; }
+        .home-hero-accent {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 120px;
+          height: 3px;
+          background: linear-gradient(90deg, #6366f1, #a78bfa);
+          border-radius: 0 0 4px 0;
+          z-index: 2;
+        }
+        .home-hero-content {
+          position: relative;
+          z-index: 2;
+          max-width: 540px;
+          padding: 1.5rem 0;
+        }
+        @media (min-width: 576px) {
+          .home-hero-content { padding: 2rem 0; }
+        }
+        @media (min-width: 992px) {
+          .home-hero-content { padding: 2.5rem 0; max-width: 560px; }
+        }
+        .home-hero-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.6875rem;
+          font-weight: 700;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.92);
+          margin-bottom: 1.25rem;
+          padding: 0.35rem 0.85rem;
+          background: rgba(255,255,255,0.08);
+          border: 1px solid rgba(255,255,255,0.12);
+          border-radius: 9999px;
+        }
+        .home-hero-badge::before {
+          content: '';
+          width: 6px;
+          height: 6px;
+          background: #a78bfa;
+          border-radius: 50%;
+          box-shadow: 0 0 10px #a78bfa;
+        }
+        .home-hero-title {
+          font-size: clamp(1.875rem, 5.5vw, 3.25rem);
+          font-weight: 800;
+          line-height: 1.1;
+          letter-spacing: -0.04em;
+          color: #fff;
+          margin-bottom: 1rem;
+          text-shadow: 0 2px 24px rgba(0,0,0,0.3);
+        }
+        @media (min-width: 768px) {
+          .home-hero-title { letter-spacing: -0.045em; }
+        }
+        .home-hero-desc {
+          font-size: clamp(0.9375rem, 2.2vw, 1.0625rem);
+          line-height: 1.65;
+          color: rgba(255,255,255,0.82);
+          margin-bottom: 1.75rem;
+          max-width: 28ch;
+        }
         .home-hero-cta {
-          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, background 0.35s ease;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          min-height: 48px;
+          padding: 0.875rem 1.75rem;
+          font-weight: 600;
+          font-size: 0.9375rem;
+          background: #fff;
+          color: #0c0c0e;
+          border-radius: 9999px;
+          text-decoration: none;
+          transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+          border: none;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.1);
         }
         .home-hero-cta:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 12px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.2);
+          color: #0c0c0e;
+          background: #f8f8fc;
+          transform: translateY(-3px);
+          box-shadow: 0 14px 36px rgba(0,0,0,0.28), 0 0 0 1px rgba(255,255,255,0.15);
         }
-        .home-hero-mesh {
-          background: radial-gradient(ellipse 70% 50% at 20% 40%, rgba(99,102,241,0.08) 0%, transparent 50%),
-                    radial-gradient(ellipse 50% 40% at 80% 60%, rgba(139,92,246,0.06) 0%, transparent 50%);
-          animation: home-mesh 16s ease-in-out infinite;
+        .home-hero-cta:active { transform: translateY(-1px); }
+        .home-hero-dots {
+          position: absolute;
+          bottom: clamp(1rem, 4vw, 1.75rem);
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 3;
+          display: flex;
+          gap: 0.5rem;
+          padding: 0.5rem;
         }
-        .home-glass-card {
-          background: rgba(255,255,255,0.72);
-          backdrop-filter: blur(24px) saturate(160%);
-          -webkit-backdrop-filter: blur(24px) saturate(160%);
-          border: 1px solid rgba(255,255,255,0.8);
-          box-shadow: 0 4px 24px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.95);
-          transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.5s ease, border-color 0.5s ease, background 0.5s ease;
+        .home-hero-dot {
+          position: relative;
+          width: 8px;
+          height: 8px;
+          min-width: 44px;
+          min-height: 44px;
+          padding: 18px;
+          border-radius: 50%;
+          border: none;
+          background: transparent;
+          transition: background 0.3s ease, transform 0.3s ease;
+          cursor: pointer;
         }
-        .home-glass-card:hover {
-          transform: translateY(-10px);
-          background: rgba(255,255,255,0.88);
-          border-color: rgba(255,255,255,0.98);
-          box-shadow: 0 28px 56px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,1);
+        .home-hero-dot::after {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.45);
+          transition: background 0.3s ease, width 0.3s ease;
         }
-        .home-glass-card:hover .home-incentive-icon { transform: scale(1.08) rotate(-2deg); }
-        .home-incentive-icon { transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .home-section-reveal {
+        .home-hero-dot.active::after {
+          background: #fff;
+          width: 22px;
+          border-radius: 4px;
+        }
+        .home-hero-dot:hover::after { background: rgba(255,255,255,0.8); }
+        /* —— Trust bar —— */
+        .home-trust-bar {
+          background: #fff;
+          padding: 1rem 0;
+          border-bottom: 1px solid rgba(0,0,0,0.06);
+          box-shadow: 0 1px 0 rgba(255,255,255,0.8);
+        }
+        @media (min-width: 768px) {
+          .home-trust-bar { padding: 1.25rem 0; }
+        }
+        .home-trust-item {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.625rem;
+          font-size: clamp(0.75rem, 1.8vw, 0.8125rem);
+          color: #374151;
+          font-weight: 500;
+          padding: 0.5rem 0.75rem;
+        }
+        @media (min-width: 768px) {
+          .home-trust-item { justify-content: flex-start; }
+        }
+        .home-trust-item svg {
+          flex-shrink: 0;
+          color: #6366f1;
+        }
+        /* —— Sections —— */
+        .home-section {
+          padding: clamp(2.5rem, 6vw, 3.5rem) 1rem;
+        }
+        @media (min-width: 576px) {
+          .home-section { padding-left: 1.5rem; padding-right: 1.5rem; }
+        }
+        @media (min-width: 992px) {
+          .home-section { padding: clamp(4rem, 8vw, 5.5rem) 1.5rem; }
+        }
+        .home-section-head {
+          margin-bottom: 1.75rem;
+        }
+        @media (min-width: 768px) {
+          .home-section-head { margin-bottom: 2.25rem; }
+        }
+        .home-section-label {
+          font-size: 0.6875rem;
+          font-weight: 700;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: #6366f1;
+          margin-bottom: 0.5rem;
+        }
+        .home-section-title {
+          font-size: clamp(1.375rem, 4vw, 1.875rem);
+          font-weight: 800;
+          letter-spacing: -0.03em;
+          color: #0f0f12;
+          margin-bottom: 0.5rem;
+          line-height: 1.2;
+        }
+        .home-section-subtitle {
+          font-size: clamp(0.875rem, 2vw, 0.9375rem);
+          color: #6b7280;
+          margin-bottom: 0;
+          line-height: 1.5;
+          max-width: 42ch;
+          margin-left: auto;
+          margin-right: auto;
+        }
+        .home-section-cta {
+          display: inline-flex;
+          align-items: center;
+          font-weight: 600;
+          font-size: 0.875rem;
+          color: #0c0c0e;
+          text-decoration: none;
+          margin-top: 1.25rem;
+          padding: 0.5rem 0;
+          min-height: 44px;
+          transition: color 0.2s ease, gap 0.2s ease;
+          gap: 0.35rem;
+        }
+        .home-section-cta:hover { color: #6366f1; gap: 0.5rem; }
+        .home-card-product-wrap {
           opacity: 0;
-          transform: translateY(36px);
-          transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+          transform: translateY(20px);
+          transition: opacity 0.5s ease, transform 0.5s ease;
         }
-        .home-section-reveal.in-view {
+        .home-section.in-view .home-card-product-wrap {
           opacity: 1;
           transform: translateY(0);
         }
-        .home-section-reveal.in-view .home-section-head .home-title-accent {
-          animation: home-title-underline 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        .home-section-reveal.in-view .home-stagger-1 { animation: home-scale-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards; }
-        .home-section-reveal.in-view .home-stagger-2 { animation: home-scale-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards; }
-        .home-section-reveal.in-view .home-stagger-3 { animation: home-scale-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards; }
-        .home-section-reveal .home-stagger-1, .home-section-reveal .home-stagger-2, .home-section-reveal .home-stagger-3 { opacity: 0; }
-        .home-product-card {
-          opacity: 0;
-          transform: translateY(24px);
-          border-radius: 1rem;
-          transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
-        }
-        .home-product-card:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-        }
-        .home-section-reveal.in-view .home-product-card:nth-child(1) { opacity: 1; transform: translateY(0); transition-delay: 0.06s; }
-        .home-section-reveal.in-view .home-product-card:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: 0.12s; }
-        .home-section-reveal.in-view .home-product-card:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 0.18s; }
-        .home-section-reveal.in-view .home-product-card:nth-child(4) { opacity: 1; transform: translateY(0); transition-delay: 0.24s; }
-        .home-section-reveal.in-view .home-product-card:nth-child(5) { opacity: 1; transform: translateY(0); transition-delay: 0.3s; }
-        .home-section-reveal.in-view .home-product-card:nth-child(6) { opacity: 1; transform: translateY(0); transition-delay: 0.36s; }
-        .home-section-reveal.in-view .home-product-card:nth-child(7) { opacity: 1; transform: translateY(0); transition-delay: 0.42s; }
-        .home-section-reveal.in-view .home-product-card:nth-child(8) { opacity: 1; transform: translateY(0); transition-delay: 0.48s; }
-        .home-best-sellers-block .home-shine-wrap { position: relative; overflow: hidden; }
-        .home-best-sellers-block .home-shine-wrap::after {
-          content: '';
-          position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-          background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.2) 45%, transparent 55%);
-          transform: translateX(-100%);
-          pointer-events: none;
-        }
-        .home-best-sellers-block:hover .home-shine-wrap::after {
-          animation: home-shine 0.8s ease-out forwards;
-        }
-        .home-categories .card {
-          transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s ease;
+        .home-section.in-view .home-card-product-wrap:nth-child(1) { transition-delay: 0.05s; }
+        .home-section.in-view .home-card-product-wrap:nth-child(2) { transition-delay: 0.1s; }
+        .home-section.in-view .home-card-product-wrap:nth-child(3) { transition-delay: 0.15s; }
+        .home-section.in-view .home-card-product-wrap:nth-child(4) { transition-delay: 0.2s; }
+        .home-section.in-view .home-card-product-wrap:nth-child(5) { transition-delay: 0.25s; }
+        .home-section.in-view .home-card-product-wrap:nth-child(6) { transition-delay: 0.3s; }
+        .home-section.in-view .home-card-product-wrap:nth-child(7) { transition-delay: 0.35s; }
+        .home-section.in-view .home-card-product-wrap:nth-child(8) { transition-delay: 0.4s; }
+        .home-category-card {
           border-radius: 1.25rem;
           overflow: hidden;
-          min-height: 280px;
-        }
-        .home-categories .card:hover {
-          transform: translateY(-8px) scale(1.02);
-          box-shadow: 0 24px 56px rgba(0,0,0,0.12);
-        }
-        .home-categories .card .full-background,
-        .home-categories .card img { transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
-        .home-categories .card:hover .full-background,
-        .home-categories .card:hover img { transform: scale(1.08); }
-        .home-btn-pill { transition: color 0.3s ease, background 0.3s ease, border-color 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease; }
-        .home-btn-pill:hover { transform: translateY(-3px); }
-        .home-btn-dark-cool {
-          background: linear-gradient(135deg, #0f0f12 0%, #1a1a1f 50%, #252530 100%);
-          border: none;
-          box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-          transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
-        }
-        .home-btn-dark-cool:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 12px 32px rgba(0,0,0,0.3);
-        }
-        .home-btn-outline-cool {
-          border-width: 2px;
-          transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, background 0.3s ease, color 0.3s ease;
-        }
-        .home-btn-outline-cool:hover {
-          transform: translateY(-3px);
+          min-height: 220px;
+          transition: transform 0.35s ease, box-shadow 0.35s ease;
           box-shadow: 0 8px 24px rgba(0,0,0,0.06);
         }
-        .home-section-title-wrap { position: relative; }
-        .home-section-title-wrap .home-title-accent {
-          display: block;
-          width: 40px;
-          height: 4px;
-          border-radius: 3px;
-          background: linear-gradient(90deg, #0f0f12 0%, #2d2d35 100%);
-          margin-bottom: 0.875rem;
-          transform-origin: left;
+        @media (min-width: 768px) {
+          .home-category-card { min-height: 280px; }
         }
-        .home-section-title-wrap.highlight .home-title-accent {
-          background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
+        .home-category-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 24px 48px rgba(0,0,0,0.12);
         }
-        .home-best-pill {
-          transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, background 0.3s ease, color 0.3s ease;
+        .home-category-card .card-background .full-background {
+          transition: transform 0.6s ease;
         }
-        .home-best-pill:hover { transform: translateY(-2px); }
-        .home-best-pill.active {
-          background: linear-gradient(135deg, #0f0f12 0%, #1a1a1f 100%);
-          color: #fff;
+        .home-category-card:hover .card-background .full-background {
+          transform: scale(1.08);
+        }
+        .home-pill {
+          padding: 0.5rem 1rem;
+          min-height: 44px;
+          font-size: 0.8125rem;
+          font-weight: 600;
+          border-radius: 9999px;
+          border: 1px solid #e5e7eb;
+          background: #fff;
+          color: #374151;
+          transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+          cursor: pointer;
+        }
+        .home-pill:hover {
+          border-color: #6366f1;
+          color: #6366f1;
+        }
+        .home-pill.active {
+          background: linear-gradient(135deg, #0f0f14 0%, #1a1a22 100%);
           border-color: transparent;
-          box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+          color: #fff;
+          box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+        }
+        /* —— Incentives —— */
+        .home-incentives {
+          background: #fff;
+          border-radius: 1.25rem;
+          padding: 1.25rem 1.25rem;
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          border: 1px solid rgba(0,0,0,0.06);
+          box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+          transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;
+        }
+        @media (min-width: 576px) {
+          .home-incentives { padding: 1.5rem; }
+        }
+        .home-incentives:hover {
+          box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+          border-color: rgba(99,102,241,0.12);
+        }
+        .home-incentive-icon {
+          width: 52px;
+          height: 52px;
+          min-width: 52px;
+          border-radius: 1rem;
+          background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          box-shadow: 0 8px 20px rgba(99,102,241,0.35);
+        }
+        .home-incentive-icon svg { color: #fff; }
+        .home-incentive-title { font-weight: 700; font-size: 0.9375rem; color: #111; margin-bottom: 0.2rem; }
+        .home-incentive-desc { font-size: 0.8125rem; color: #6b7280; margin: 0; line-height: 1.4; }
+        /* —— Testimonial —— */
+        .home-testimonial {
+          background: #fff;
+          border-radius: 1.25rem;
+          padding: 1.75rem 1.5rem;
+          border: 1px solid rgba(0,0,0,0.06);
+          max-width: 640px;
+          margin: 0 auto;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+          position: relative;
+        }
+        @media (min-width: 576px) {
+          .home-testimonial { padding: 2.25rem 2.5rem; }
+        }
+        .home-testimonial::before {
+          content: '"';
+          position: absolute;
+          top: 1rem;
+          left: 1.25rem;
+          font-size: 3rem;
+          font-weight: 700;
+          color: #6366f1;
+          opacity: 0.2;
+          line-height: 1;
         }
         .home-testimonial-quote {
-          border-left: 4px solid #6366f1;
-          padding-left: 1.5rem;
-          transition: box-shadow 0.4s ease, transform 0.4s ease;
+          font-size: clamp(1rem, 2.2vw, 1.125rem);
+          line-height: 1.7;
+          color: #374151;
+          font-style: italic;
+          margin-bottom: 1rem;
+          padding-left: 0.5rem;
         }
-        .home-testimonial-quote:hover {
-          box-shadow: 0 16px 48px rgba(0,0,0,0.06);
+        .home-testimonial-author { font-weight: 600; color: #111; font-size: 0.9375rem; }
+        /* —— Newsletter CTA —— */
+        .home-newsletter {
+          background: linear-gradient(145deg, #0c0c0e 0%, #15151c 40%, #1a1a24 100%);
+          border-radius: 1.25rem;
+          padding: clamp(2rem, 5vw, 3rem) 1.5rem;
+          text-align: center;
+          position: relative;
+          overflow: hidden;
+          box-shadow: 0 24px 56px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.06);
         }
-        .home-page-bg {
-          background: #f8f9fa;
-          background-image: radial-gradient(ellipse 100% 60% at 50% -10%, rgba(99,102,241,0.035) 0%, transparent 55%),
-                            radial-gradient(ellipse 80% 40% at 80% 100%, rgba(139,92,246,0.02) 0%, transparent 50%);
+        .home-newsletter::before {
+          content: '';
+          position: absolute;
+          top: -50%;
+          right: -20%;
+          width: 60%;
+          height: 200%;
+          background: radial-gradient(ellipse at center, rgba(99,102,241,0.15) 0%, transparent 70%);
+          pointer-events: none;
         }
-        .home-float-subtle { animation: home-float 5s ease-in-out infinite; }
-        .home-section-reveal.in-view .home-product-card { opacity: 1; transform: translateY(0); }
+        .home-newsletter-title {
+          font-size: clamp(1.125rem, 3vw, 1.5rem);
+          font-weight: 800;
+          color: #fff;
+          margin-bottom: 0.5rem;
+          position: relative;
+        }
+        .home-newsletter-desc {
+          font-size: clamp(0.875rem, 2vw, 0.9375rem);
+          color: rgba(255,255,255,0.78);
+          margin-bottom: 1.5rem;
+          position: relative;
+        }
+        .home-newsletter .home-hero-cta {
+          position: relative;
+        }
+        /* Responsive: product grid and touch targets */
+        .home-page .card-product {
+          min-height: 100%;
+        }
+        @media (max-width: 575.98px) {
+          .home-hero-dots { bottom: 1rem; }
+          .home-pills-wrap {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.25rem;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+          }
+          .home-pills-wrap::-webkit-scrollbar { display: none; }
+          .home-pill { flex-shrink: 0; }
+        }
       `}</style>
-      {/* Hero — premium glassmorphism */}
-      <section
-        className="position-relative overflow-hidden rounded-4 mx-2 mx-md-3 mx-lg-5 mb-5 mb-lg-6 home-hero-section"
-        style={{
-          background: 'linear-gradient(155deg, #050507 0%, #0a0a0e 20%, #0f0f14 40%, #14141c 60%, #18181f 80%, #1c1c26 100%)',
-          minHeight: 'min(92vh, 700px)',
-          boxShadow: '0 32px 96px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04), 0 0 120px rgba(99,102,241,0.06)',
-        }}
-      >
-        {/* Soft glass orbs — depth */}
-        <div className="hero-glass-orb" style={{ width: 360, height: 360, background: 'rgba(99,102,241,0.22)', top: '8%', left: '3%' }} aria-hidden />
-        <div className="hero-glass-orb" style={{ width: 280, height: 280, background: 'rgba(139,92,246,0.16)', bottom: '15%', right: '12%', animationDelay: '-4s' }} aria-hidden />
-        <div className="hero-glass-orb" style={{ width: 200, height: 200, background: 'rgba(255,255,255,0.06)', top: '48%', left: '28%', animationDelay: '-7s' }} aria-hidden />
-        <div className="hero-glass-orb" style={{ width: 120, height: 120, background: 'rgba(99,102,241,0.1)', top: '75%', left: '8%', animationDelay: '-2s' }} aria-hidden />
-        {/* Gradient overlay for depth */}
-        <div
-          className="position-absolute top-0 start-0 end-0 bottom-0 rounded-4 home-hero-copy-wrap"
-          style={{
-            width: '100%',
-            maxWidth: '100%',
-            background: 'linear-gradient(102deg, rgba(6,6,8,0.92) 0%, rgba(6,6,8,0.5) 38%, transparent 62%)',
-            zIndex: 10,
-            padding: 'clamp(2rem, 5vw, 3.25rem) clamp(1.5rem, 4vw, 4rem)',
-            pointerEvents: 'none',
-          }}
-        />
-        <div
-          className="position-absolute d-flex align-items-center rounded-4"
-          style={{
-            left: 'clamp(1.5rem, 4vw, 4rem)',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            zIndex: 11,
-            pointerEvents: 'auto',
-            maxWidth: 'min(100%, 480px)',
-          }}
-        >
-          <div className="hero-glass-panel p-4 p-md-5 position-relative">
-            <div className="home-hero-content position-relative" style={{ maxWidth: '100%' }}>
-              <div
-                className="home-hero-item mb-3"
-                style={{ width: 56, height: 3, background: 'linear-gradient(90deg, rgba(99,102,241,0.9) 0%, rgba(139,92,246,0.7) 50%, rgba(255,255,255,0.2) 100%)', borderRadius: 3 }}
-                aria-hidden
-              />
-              <p className="home-hero-item hero-glass-badge text-uppercase mb-3 d-inline-block">
-                New collection
-              </p>
-              <h1
-                className="home-hero-item fw-bold mb-3 lh-tight home-hero-gradient-text"
-                style={{ letterSpacing: '-0.04em', fontSize: 'clamp(2.1rem, 5.2vw, 3.35rem)', lineHeight: 1.12 }}
-              >
-                Quality first. Style that lasts.
-              </h1>
-              <p
-                className="home-hero-item mb-4 text-white"
-                style={{ fontSize: '1.0625rem', opacity: 0.94, lineHeight: 1.6 }}
-              >
-                Premium picks for every moment. {freeShippingText}.
-              </p>
-              <a
-                href="/shop/"
-                className="home-hero-item btn rounded-pill px-5 py-3 hero-cta-glass border-0"
-                style={{ fontSize: '0.9375rem' }}
-              >
-                Shop now
-              </a>
-            </div>
+
+      {/* Hero */}
+      <section className="home-hero">
+        <div className="home-hero-accent" aria-hidden />
+        <div className="home-hero-bg" aria-hidden>
+          {heroImages.map((src, i) => (
+            <img
+              key={src}
+              src={src}
+              alt=""
+              className={heroSlide === i ? 'active' : ''}
+              style={{ position: 'absolute', inset: 0 }}
+              loading={i === 0 ? 'eager' : 'lazy'}
+            />
+          ))}
+        </div>
+        <div className="home-hero-overlay" aria-hidden />
+        <div className="container position-relative">
+          <div className="home-hero-content">
+            <span className="home-hero-badge">New collection</span>
+            <h1 className="home-hero-title">Quality first. Style that lasts.</h1>
+            <p className="home-hero-desc">
+              Premium picks for every moment. {freeShippingText}.
+            </p>
+            <a href="/shop/" className="home-hero-cta">
+              Shop now
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
           </div>
         </div>
-        {/* Ambient mesh */}
-        <div className="position-absolute top-0 start-0 end-0 bottom-0 rounded-4 home-hero-mesh pointer-events-none" aria-hidden />
-        <div
-          className="position-absolute top-0 start-0 end-0 bottom-0 rounded-4 pointer-events-none"
-          style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.8\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'0.08\'/%3E%3C/svg%3E")' }}
-          aria-hidden
-        />
-        {/* Mobile: carousel background */}
-        <div className="position-absolute top-0 end-0 bottom-0 start-0 d-lg-none rounded-4 d-flex align-items-end" aria-hidden>
-          <div className="hero-carousel-frame position-absolute m-2" style={{ bottom: '0.75rem', top: '0.75rem', left: '0.75rem', right: '0.75rem' }}>
-            {heroCarouselImages.map((src, i) => (
-              <div
-                key={`m-${src}`}
-                className={`hero-carousel-slide position-absolute top-0 start-0 end-0 bottom-0 ${heroSlide === i ? 'active' : ''}`}
-                style={{ opacity: heroSlide === i ? 0.28 : 0, zIndex: heroSlide === i ? 1 : 0 }}
-              >
-                <img src={src} alt="" className="position-absolute top-0 start-0 end-0 bottom-0 h-100 w-100" style={{ objectFit: 'cover' }} loading={i === 0 ? 'eager' : 'lazy'} />
-              </div>
-            ))}
-          </div>
-        </div>
-        {/* Desktop: right carousel + indicators */}
-        <div
-          className="position-absolute top-0 end-0 bottom-0 d-none d-lg-flex align-items-center justify-content-center"
-          style={{ width: '52%', paddingRight: 'clamp(1.25rem, 3.5vw, 2.5rem)' }}
-          aria-hidden
-        >
-          <div className="position-relative d-flex flex-column align-items-center gap-3" style={{ width: '90%', maxWidth: '480px', height: '82%', maxHeight: '460px' }}>
-            <div className="hero-carousel-frame position-relative flex-grow-1 w-100 rounded-4 overflow-hidden">
-              {heroCarouselImages.map((src, i) => (
-                <div
-                  key={`d-${src}`}
-                  className={`hero-carousel-slide position-absolute top-0 start-0 end-0 bottom-0 ${heroSlide === i ? 'active' : ''}`}
-                  style={{ opacity: heroSlide === i ? 1 : 0, zIndex: heroSlide === i ? 1 : 0 }}
-                >
-                  <img src={src} alt="" className="position-absolute top-0 start-0 end-0 bottom-0 h-100 w-100" style={{ objectFit: 'cover' }} loading={i === 0 ? 'eager' : 'lazy'} />
-                </div>
-              ))}
-              <div className="position-absolute bottom-0 start-0 end-0 p-3" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.25) 0%, transparent 100%)', pointerEvents: 'none' }} />
-            </div>
-            <div className="d-flex align-items-center gap-2 flex-shrink-0">
-              {heroCarouselImages.map((_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  className="hero-dot-btn border-0 rounded-pill p-0 bg-white"
-                  style={{
-                    width: heroSlide === i ? 20 : 8,
-                    height: 8,
-                    opacity: heroSlide === i ? 1 : 0.4,
-                    background: heroSlide === i ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.4)',
-                  }}
-                  aria-label={`Slide ${i + 1}`}
-                  onClick={() => setHeroSlide(i)}
-                />
-              ))}
-            </div>
-          </div>
+        <div className="home-hero-dots">
+          {heroImages.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              className={`home-hero-dot ${heroSlide === i ? 'active' : ''}`}
+              aria-label={`Slide ${i + 1}`}
+              onClick={() => setHeroSlide(i)}
+            />
+          ))}
         </div>
       </section>
 
-      {/* 1. Featured Categories — Martup-style */}
+      {/* Trust bar — builds confidence */}
+      <div className="home-trust-bar">
+        <div className="container">
+          <div className="row g-3 g-md-0 justify-content-center justify-content-md-between align-items-center text-center text-md-start">
+            <div className="col-12 col-md-4">
+              <div className="home-trust-item justify-content-center justify-content-md-start">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                {freeShippingText}
+              </div>
+            </div>
+            <div className="col-12 col-md-4">
+              <div className="home-trust-item justify-content-center justify-content-md-start">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Secure checkout
+              </div>
+            </div>
+            <div className="col-12 col-md-4">
+              <div className="home-trust-item justify-content-center justify-content-md-start">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                We're here to help
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Categories */}
       {displayCategories.length > 0 && (
         <section
-          ref={setSectionRef(1)}
-          data-section-index={1}
-          className={`py-6 py-lg-7 home-categories home-section-reveal ${visible[1] ? 'in-view' : ''}`}
+          ref={setSectionRef(0)}
+          data-section-index={0}
+          className={`home-section home-section-reveal ${visible[0] ? 'in-view' : ''}`}
+          style={{ background: '#fff' }}
         >
           <div className="container">
-            <div className="text-center mb-5 home-section-head">
-              <div className="home-section-title-wrap d-inline-block text-start">
-                <div className="home-title-accent" />
-                <h2 className="h3 fw-bold mb-2" style={{ letterSpacing: '-0.03em' }}>Featured Categories</h2>
-              </div>
-              <p className="text-body-secondary mb-0 mx-auto" style={{ maxWidth: '28rem', fontSize: '1rem' }}>
-                Browse our most popular categories and find the perfect picks.
-              </p>
+            <div className="home-section-head text-center">
+              <p className="home-section-label">Browse</p>
+              <h2 className="home-section-title">Shop by category</h2>
+              <p className="home-section-subtitle text-center">Find what you love by collection</p>
             </div>
-            <div className="row g-3 g-lg-4 align-items-stretch">
+            <div className="row g-3 g-lg-4">
               {displayCategories.map((cat) => (
-                <div key={cat.id} className="col-6 col-lg-3 d-flex">
-                  <CardCategory
-                    thumb_src={cat.thumb_src}
-                    title={cat.title}
-                    collection={cat.collection}
-                    productCount={productCountByCategory[cat.id]}
-                    categoryId={cat.id}
-                  />
+                <div key={cat.id} className="col-6 col-lg-3">
+                  <div className="home-category-card">
+                    <CardCategory
+                      thumb_src={cat.thumb_src}
+                      title={cat.title}
+                      collection={cat.collection}
+                      productCount={productCountByCategory[cat.id]}
+                      categoryId={cat.id}
+                    />
+                  </div>
                 </div>
               ))}
             </div>
-            <div className="text-center mt-4">
-              <a href="/shop/" className="btn btn-outline-dark rounded-pill fw-semibold home-btn-pill home-btn-outline-cool">
-                View all categories
-              </a>
+            <div className="text-center mt-3">
+              <a href="/shop/" className="home-section-cta">View all categories →</a>
             </div>
           </div>
         </section>
       )}
 
-      {/* 2. New Arrivals */}
+      {/* New Arrivals */}
       {featuredProducts.length > 0 && (
         <section
-          ref={setSectionRef(2)}
-          data-section-index={2}
-          className={`py-6 py-lg-7 home-section-reveal ${visible[2] ? 'in-view' : ''}`}
-          style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f8f9fa 45%, #f1f3f5 100%)' }}
+          ref={setSectionRef(1)}
+          data-section-index={1}
+          className={`home-section home-section-reveal ${visible[1] ? 'in-view' : ''}`}
         >
           <div className="container">
-            <div className="text-center mb-5 home-section-head">
-              <div className="home-section-title-wrap highlight d-inline-block text-start">
-                <div className="home-title-accent" />
-                <h2 className="h3 fw-bold mb-2" style={{ letterSpacing: '-0.03em' }}>New Arrivals</h2>
-              </div>
-              <p className="text-body-secondary mb-0 mx-auto" style={{ maxWidth: '28rem', fontSize: '1rem' }}>
-                Discover our latest collection designed for modern living.
-              </p>
+            <div className="home-section-head text-center">
+              <p className="home-section-label">New</p>
+              <h2 className="home-section-title">New arrivals</h2>
+              <p className="home-section-subtitle text-center">Fresh picks for the season</p>
             </div>
             <div className="row g-3 g-lg-4">
               {featuredProducts.slice(0, 4).map((product) => (
-                <div key={product.id} className="col-6 col-lg-3 home-product-card">
+                <div key={product.id} className="col-6 col-lg-3 home-card-product-wrap">
                   <CardProduct
                     thumb_src={product.thumb_src}
                     thumb_alt={product.thumb_alt || product.title}
@@ -654,38 +666,33 @@ export default function HomePageContent() {
                 </div>
               ))}
             </div>
-            <div className="text-center mt-4">
-              <a href="/shop/?sort=new-arrivals" className="btn btn-dark rounded-pill px-4 fw-semibold home-btn-pill home-btn-dark-cool">
-                View all New Arrivals
-              </a>
+            <div className="text-center mt-3">
+              <a href="/shop/?sort=new-arrivals" className="home-section-cta">View new arrivals →</a>
             </div>
           </div>
         </section>
       )}
 
-      {/* 3. Best Sellers */}
+      {/* Best Sellers */}
       <section
-        ref={setSectionRef(3)}
-        data-section-index={3}
-        className={`py-6 py-lg-7 home-section-reveal ${visible[3] ? 'in-view' : ''}`}
+        ref={setSectionRef(2)}
+        data-section-index={2}
+        className={`home-section home-section-reveal ${visible[2] ? 'in-view' : ''}`}
+        style={{ background: '#fff' }}
       >
         <div className="container">
-          <div className="text-center mb-5 home-section-head">
-            <div className="home-section-title-wrap d-inline-block text-start">
-              <div className="home-title-accent" />
-              <h2 className="h3 fw-bold mb-2" style={{ letterSpacing: '-0.03em' }}>Best Sellers</h2>
-            </div>
-            <p className="text-body-secondary mb-0 mx-auto" style={{ maxWidth: '28rem', fontSize: '1rem' }}>
-              Our most popular products based on sales and customer satisfaction.
-            </p>
+          <div className="home-section-head text-center">
+            <p className="home-section-label">Popular</p>
+            <h2 className="home-section-title">Best sellers</h2>
+            <p className="home-section-subtitle text-center">Customer favorites</p>
           </div>
-          <div className="d-flex flex-wrap justify-content-center gap-2 mb-4">
+          <div className="d-flex flex-wrap justify-content-center gap-2 mb-4 px-1 home-pills-wrap">
             {bestSellerCategories.map((cat) => (
               <button
                 key={cat.id}
                 type="button"
                 onClick={() => setBestSellerFilter(cat.id)}
-                className={`btn rounded-pill fw-semibold home-best-pill ${bestSellerFilter === cat.id ? 'active btn-dark' : 'btn-outline-dark'}`}
+                className={`home-pill ${bestSellerFilter === cat.id ? 'active' : ''}`}
               >
                 {cat.title}
               </button>
@@ -693,7 +700,7 @@ export default function HomePageContent() {
           </div>
           <div className="row g-3 g-lg-4">
             {(bestSellerProducts.length > 0 ? bestSellerProducts : inStockProducts.slice(0, 8)).map((product) => (
-              <div key={product.id} className="col-6 col-lg-3 home-product-card">
+              <div key={product.id} className="col-6 col-lg-3 home-card-product-wrap">
                 <CardProduct
                   thumb_src={product.thumb_src}
                   thumb_alt={product.thumb_alt || product.title}
@@ -712,92 +719,95 @@ export default function HomePageContent() {
               </div>
             ))}
           </div>
-          <div className="text-center mt-4">
-            <a href="/shop/?sort=best-sellers" className="btn btn-outline-dark rounded-pill fw-semibold home-btn-pill home-btn-outline-cool">
-              View all Best Sellers
+          <div className="text-center mt-3">
+            <a href="/shop/?sort=best-sellers" className="home-section-cta">View all best sellers →</a>
+          </div>
+        </div>
+      </section>
+
+      {/* Incentives */}
+      <section
+        ref={setSectionRef(3)}
+        data-section-index={3}
+        className={`home-section home-section-reveal ${visible[3] ? 'in-view' : ''}`}
+      >
+        <div className="container">
+          <div className="row g-3 g-md-4 justify-content-center">
+            <div className="col-12 col-md-4">
+              <div className="home-incentives">
+                <div className="home-incentive-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                </div>
+                <div>
+                  <div className="home-incentive-title">Fast delivery</div>
+                  <p className="home-incentive-desc">{freeShippingText}</p>
+                </div>
+              </div>
+            </div>
+            <div className="col-12 col-md-4">
+              <div className="home-incentives">
+                <div className="home-incentive-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div>
+                  <div className="home-incentive-title">Secure checkout</div>
+                  <p className="home-incentive-desc">Safe and encrypted payments</p>
+                </div>
+              </div>
+            </div>
+            <div className="col-12 col-md-4">
+              <div className="home-incentives">
+                <div className="home-incentive-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <div>
+                  <div className="home-incentive-title">Support</div>
+                  <p className="home-incentive-desc">We're here to help</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonial */}
+      <section
+        ref={setSectionRef(4)}
+        data-section-index={4}
+        className={`home-section home-section-reveal ${visible[4] ? 'in-view' : ''}`}
+        style={{ background: '#fff' }}
+      >
+        <div className="container">
+          <div className="home-section-head text-center">
+            <p className="home-section-label">Testimonials</p>
+            <h2 className="home-section-title">What customers say</h2>
+            <p className="home-section-subtitle text-center">Real feedback from people who shop with us</p>
+          </div>
+          <div className="home-testimonial">
+            <p className="home-testimonial-quote">
+              &ldquo;The quality and style from OPAL is exceptional. I always find something that fits my taste and the delivery is fast.&rdquo;
+            </p>
+            <p className="home-testimonial-author mb-0">Sarah M. — Happy customer</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Newsletter CTA */}
+      <section
+        ref={setSectionRef(5)}
+        data-section-index={5}
+        className={`home-section home-section-reveal ${visible[5] ? 'in-view' : ''}`}
+      >
+        <div className="container">
+          <div className="home-newsletter mx-auto" style={{ maxWidth: '720px' }}>
+            <h3 className="home-newsletter-title">Join the OPAL community</h3>
+            <p className="home-newsletter-desc">Get updates on new arrivals and exclusive offers.</p>
+            <a href="/contact/" className="home-hero-cta" style={{ background: '#fff', color: '#0c0c0e' }}>
+              Contact us
             </a>
           </div>
         </div>
       </section>
-
-      {/* 4. Incentives */}
-      <section
-        ref={setSectionRef(4)}
-        data-section-index={4}
-        className={`py-6 py-lg-7 home-section-reveal ${visible[4] ? 'in-view' : ''}`}
-      >
-        <div className="container">
-          <div className="row g-3 g-md-4">
-            <div className="col-12 col-md-4 home-stagger-1">
-              <div className="home-glass-card d-flex align-items-center gap-3 p-4 p-md-4 rounded-4 h-100">
-                <div className="home-incentive-icon rounded-4 d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: 52, height: 52, background: 'linear-gradient(135deg, #1a1a1f 0%, #2d2d35 100%)' }}>
-                  <svg className="text-white" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" /><polygon points="16 8 20 8 23 11 23 16 16 16 16 8" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /></svg>
-                </div>
-                <div>
-                  <h6 className="mb-1 fw-bold">Fast delivery</h6>
-                  <p className="mb-0 small text-body-secondary">{freeShippingText}</p>
-                </div>
-              </div>
-            </div>
-            <div className="col-12 col-md-4 home-stagger-2">
-              <div className="home-glass-card d-flex align-items-center gap-3 p-4 p-md-4 rounded-4 h-100">
-                <div className="home-incentive-icon rounded-4 d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: 52, height: 52, background: 'linear-gradient(135deg, #1a1a1f 0%, #2d2d35 100%)' }}>
-                  <svg className="text-white" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-                </div>
-                <div>
-                  <h6 className="mb-1 fw-bold">Secure checkout</h6>
-                  <p className="mb-0 small text-body-secondary">Safe and encrypted payments</p>
-                </div>
-              </div>
-            </div>
-            <div className="col-12 col-md-4 home-stagger-3">
-              <div className="home-glass-card d-flex align-items-center gap-3 p-4 p-md-4 rounded-4 h-100">
-                <div className="home-incentive-icon rounded-4 d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: 52, height: 52, background: 'linear-gradient(135deg, #1a1a1f 0%, #2d2d35 100%)' }}>
-                  <svg className="text-white" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
-                </div>
-                <div>
-                  <h6 className="mb-1 fw-bold">Support</h6>
-                  <p className="mb-0 small text-body-secondary">We're here to help</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. Testimonials */}
-      <section
-        ref={setSectionRef(5)}
-        data-section-index={5}
-        className={`py-6 py-lg-7 home-section-reveal ${visible[5] ? 'in-view' : ''}`}
-        style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%)' }}
-      >
-        <div className="container">
-          <div className="text-center mb-5 home-section-head">
-            <div className="home-section-title-wrap highlight d-inline-block text-start">
-              <div className="home-title-accent" />
-              <h2 className="h3 fw-bold mb-2" style={{ letterSpacing: '-0.03em' }}>What our customers say</h2>
-            </div>
-            <p className="text-body-secondary mb-0 mx-auto" style={{ maxWidth: '28rem', fontSize: '1rem' }}>
-              Read testimonials from satisfied customers about their experience with OPAL.
-            </p>
-          </div>
-          <div className="row justify-content-center">
-            <div className="col-12 col-lg-8">
-              <blockquote className="home-glass-card home-testimonial-quote rounded-4 p-4 p-lg-5 mb-0 text-start border-0">
-                <p className="fs-5 text-body mb-3 fst-italic">
-                  &ldquo;The quality and style from OPAL is exceptional. I always find something that fits my taste and the delivery is fast.&rdquo;
-                </p>
-                <footer className="text-body-secondary">
-                  <strong className="text-dark">Sarah M.</strong>
-                  <span className="opacity-75"> — Happy customer</span>
-                </footer>
-              </blockquote>
-            </div>
-          </div>
-        </div>
-      </section>
-
     </div>
   );
 }

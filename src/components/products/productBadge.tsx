@@ -36,11 +36,11 @@ export default function ProductBadge({ colors, selectedColor, onSelectColor }: P
             key={color}
             role={isSelectable ? 'button' : undefined}
             tabIndex={isSelectable ? 0 : undefined}
-            className={`rounded-circle border ${selected ? 'border-dark border-3' : 'border-secondary'}`}
+            className={`product-color-swatch rounded-circle ${selected ? 'selected' : ''}`}
             style={{
               backgroundColor: getColorHex(color),
-              width: '1.5rem',
-              height: '1.5rem',
+              width: '2rem',
+              height: '2rem',
               display: 'inline-block',
               cursor: isSelectable ? 'pointer' : undefined,
             }}
@@ -52,6 +52,17 @@ export default function ProductBadge({ colors, selectedColor, onSelectColor }: P
           />
         );
       })}
+      <style>{`
+        .product-color-swatch {
+          border: 2px solid rgba(0,0,0,0.15);
+          transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+        }
+        .product-color-swatch:hover { transform: scale(1.08); }
+        .product-color-swatch.selected {
+          border-color: #212529;
+          box-shadow: 0 0 0 2px #fff, 0 0 0 4px #212529;
+        }
+      `}</style>
     </div>
   );
 }

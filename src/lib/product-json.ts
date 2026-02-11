@@ -18,6 +18,7 @@ export interface ProductJsonInput {
     currency?: string;
     discountPrice?: number;
     inStock?: boolean;
+    sizePrices?: Record<string, number>;
   };
   images?: {
     cover?: string;
@@ -67,6 +68,7 @@ export function jsonToProduct(json: ProductJsonInput): Partial<Omit<Product, 'id
     discountPrice: p?.discountPrice,
     currency: p?.currency,
     stock: p?.inStock ?? true,
+    sizePrices: p?.sizePrices,
     thumb_src: imgs?.cover ?? '',
     images: gallery.length > 0 ? gallery : undefined,
     features: features.length > 0 ? features : undefined,

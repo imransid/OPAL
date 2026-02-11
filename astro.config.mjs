@@ -8,7 +8,7 @@ import vercel from "@astrojs/vercel/serverless";
 const site =
   process.env.PUBLIC_SITE_URL ||
   (process.env.VERCEL_URL
-    ? `https://${process.env.vercel_url}`
+    ? `https://${process.env.VERCEL_URL}`
     : "https://opal.example.com");
 
 export default defineConfig({

@@ -47,7 +47,8 @@ const productJsonLd = product
 	description={description}
 	image={image}
 	imageAlt={product?.thumb_alt ?? product?.title ?? 'Product'}
-	canonical={id ? `${site}/product?id=${id}` : undefined}
+	canonical={id && product ? `${site}/product?id=${id}` : undefined}
+	noindex={!product}
 	structuredData={productJsonLd}
 >
 	<main>

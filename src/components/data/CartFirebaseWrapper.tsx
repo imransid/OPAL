@@ -43,7 +43,8 @@ export default function CartFirebaseWrapper() {
           const p = byId.get(item.id);
           if (!p) return null;
           const qty = item.qty || 1;
-          const price = p.discountPrice ?? p.price;
+          const sizePrice = item.size && p.sizePrices && p.sizePrices[item.size] != null ? p.sizePrices[item.size] : null;
+          const price = sizePrice ?? p.discountPrice ?? p.price;
           return {
             productId: p.id,
             thumb_src: p.thumb_src || p.images?.[0]?.src || '',

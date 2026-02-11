@@ -48,6 +48,8 @@ export interface Product {
   reviews?: number;
   size?: string;
   sizes?: Record<string, number>;
+  /** Price per size (overrides product price when user selects that size) */
+  sizePrices?: Record<string, number>;
   highlights?: string[];
   features?: (string | ProductFeature)[];
   data?: Record<string, string | number | boolean>;

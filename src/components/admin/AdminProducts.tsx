@@ -11,6 +11,7 @@ const defaultProduct: Omit<Product, 'id'> = {
   stock: true,
   colors: [],
   sizes: {},
+  sizePrices: {},
   images: [],
   resource: '',
 };
@@ -32,6 +33,7 @@ export default function AdminProducts() {
   /** Raw comma-separated strings so user can type commas; parsed on submit */
   const [colorsStr, setColorsStr] = useState('');
   const [sizesStr, setSizesStr] = useState('');
+  const [sizePricesStr, setSizePricesStr] = useState('');
 
   const load = async () => {
     setLoading(true);
@@ -76,6 +78,7 @@ export default function AdminProducts() {
     setJsonInput('');
     setColorsStr('');
     setSizesStr('');
+    setSizePricesStr('');
     syncJsonFields(defaultProduct);
   };
 
@@ -101,6 +104,7 @@ export default function AdminProducts() {
       reviews: p.reviews,
       size: p.size,
       sizes: p.sizes ?? {},
+      sizePrices: p.sizePrices ?? {},
       highlights: p.highlights,
       features: p.features,
       data: p.data,
@@ -118,8 +122,15 @@ export default function AdminProducts() {
     setSizesStr(
       p.sizes && Object.keys(p.sizes).length > 0
         ? Object.entries(p.sizes)
-            .map(([s, n]) => (n > 0 ? `${s}:${n}` : s))
-            .join(', ')
+          .map(([s, n]) => (n > 0 ? `${s}:${n}` : s))
+          .join(', ')
+        : ''
+    );
+    setSizePricesStr(
+      p.sizePrices && Object.keys(p.sizePrices).length > 0
+        ? Object.entries(p.sizePrices)
+          .map(([s, pr]) => `${s}:${pr}`)
+          .join(', ')
         : ''
     );
     syncJsonFields({
@@ -142,8 +153,8 @@ export default function AdminProducts() {
       setSizesStr(
         next.sizes && Object.keys(next.sizes).length > 0
           ? Object.entries(next.sizes)
-              .map(([s, n]) => (n > 0 ? `${s}:${n}` : s))
-              .join(', ')
+            .map(([s, n]) => (n > 0 ? `${s}:${n}` : s))
+            .join(', ')
           : ''
       );
       syncJsonFields(next);
@@ -180,6 +191,16 @@ export default function AdminProducts() {
       }
     });
     merged.sizes = parsedSizes;
+    const parsedSizePrices: Record<string, number> = {};
+    sizePricesStr.split(',').map((s) => s.trim()).filter(Boolean).forEach((part) => {
+      const colon = part.indexOf(':');
+      if (colon > 0) {
+        const k = part.slice(0, colon).trim();
+        const v = parseFloat(part.slice(colon + 1).trim());
+        if (!Number.isNaN(v)) parsedSizePrices[k] = v;
+      }
+    });
+    merged.sizePrices = Object.keys(parsedSizePrices).length > 0 ? parsedSizePrices : undefined;
     try {
       if (editing) {
         await updateProduct(editing.id, merged);
@@ -190,6 +211,7 @@ export default function AdminProducts() {
       setForm(defaultProduct);
       setColorsStr('');
       setSizesStr('');
+      setSizePricesStr('');
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to save');
@@ -366,6 +388,17 @@ export default function AdminProducts() {
                   <small className="text-body-secondary">Comma-separated. Optional stock per size: Size:qty</small>
                 </div>
                 <div className="mb-2">
+                  <label className="form-label">Size-wise price (optional)</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={sizePricesStr}
+                    onChange={(e) => setSizePricesStr(e.target.value)}
+                    placeholder="S:10, M:12, L:14"
+                  />
+                  <small className="text-body-secondary">Different price per size. Format: Size:price (comma-separated). Product price is used when no size or size not listed.</small>
+                </div>
+                <div className="mb-2">
                   <label className="form-label">Image URL (cover/thumb)</label>
                   <input type="text" className="form-control" value={form.thumb_src} onChange={(e) => update('thumb_src', e.target.value)} placeholder="/images/cover.jpg or gs://..." />
                 </div>
@@ -445,9 +478,6 @@ export default function AdminProducts() {
                     <tr>
                       <th>Image</th>
                       <th>Title</th>
-                      <th>Model</th>
-                      <th>Category</th>
-                      <th>Price</th>
                       <th>Stock</th>
                       <th>Actions</th>
                     </tr>
@@ -461,10 +491,7 @@ export default function AdminProducts() {
                           <td>
                             {p.thumb_src ? <img src={p.thumb_src} alt="" width={40} height={40} style={{ objectFit: 'cover' }} className="rounded" /> : '—'}
                           </td>
-                          <td>{p.title}</td>
-                          <td>{p.model ?? '—'}</td>
-                          <td>{getCategoryTitle(p.categoryId)}</td>
-                          <td>{p.currency ?? ''}{p.price}{p.discountPrice != null ? ` → ${p.discountPrice}` : ''}</td>
+                          <td>{p.title.length > 25 ? p.title.slice(0, 25) + '...' : p.title}</td>
                           <td>
                             <span className={`badge ${p.stock !== false ? 'bg-success' : 'bg-danger'} me-1`}>
                               {p.stock !== false ? 'In stock' : 'Out of stock'}
@@ -527,6 +554,12 @@ export default function AdminProducts() {
                       <dd className="col-sm-9">{viewProduct.color ?? (viewProduct.colors?.length ? viewProduct.colors.join(', ') : '—')}</dd>
                       <dt className="col-sm-3">Size available</dt>
                       <dd className="col-sm-9">{viewProduct.sizes && Object.keys(viewProduct.sizes).length ? Object.keys(viewProduct.sizes).join(', ') : '—'}</dd>
+                      {viewProduct.sizePrices && Object.keys(viewProduct.sizePrices).length > 0 && (
+                        <>
+                          <dt className="col-sm-3">Size prices</dt>
+                          <dd className="col-sm-9">{Object.entries(viewProduct.sizePrices).map(([s, pr]) => `${s}: ${viewProduct.currency ?? ''}${pr}`).join(', ')}</dd>
+                        </>
+                      )}
                       <dt className="col-sm-3">Resource</dt>
                       <dd className="col-sm-9">{viewProduct.resource ?? '—'}</dd>
                       <dt className="col-sm-3">Slug</dt>

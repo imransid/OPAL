@@ -6,14 +6,16 @@ import type { APIRoute } from 'astro';
  */
 export const GET: APIRoute = ({ site }) => {
   const base = site?.href || 'https://opal.example.com';
-  const sitemapUrl = new URL('sitemap-index.xml', base);
+  const sitemapIndex = new URL('sitemap-index.xml', base);
+  const sitemapProducts = new URL('sitemap-products.xml', base);
 
   const content = `User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /api/
 
-Sitemap: ${sitemapUrl.href}
+Sitemap: ${sitemapIndex.href}
+Sitemap: ${sitemapProducts.href}
 `;
 
   return new Response(content, {

@@ -67,11 +67,16 @@ export default function CheckoutFirebaseWrapper() {
     );
   }
 
-  const subtotal = cartProducts.reduce((sum, { product: p, item }) => sum + (p.discountPrice ?? p.price) * (item.qty || 1), 0);
+  const subtotal = cartProducts.reduce((sum, { product: p, item }) => {
+    const sizePrice = item.size && p.sizePrices && p.sizePrices[item.size] != null ? p.sizePrices[item.size] : null;
+    const price = sizePrice ?? p.discountPrice ?? p.price;
+    return sum + price * (item.qty || 1);
+  }, 0);
   const shipping = computeShipping(subtotal, shippingCost, freeShippingThreshold);
 
   const forSummary = cartProducts.map(({ product: p, item }) => {
-    const price = p.discountPrice ?? p.price;
+    const sizePrice = item.size && p.sizePrices && p.sizePrices[item.size] != null ? p.sizePrices[item.size] : null;
+    const price = sizePrice ?? p.discountPrice ?? p.price;
     const qty = item.qty || 1;
     return {
       productId: p.id,
