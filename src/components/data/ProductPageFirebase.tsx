@@ -90,11 +90,15 @@ export default function ProductPageFirebase({ productId }: Props) {
         productId={product.id}
         title={product.title}
         brand={product.brand}
+        brandOrigin={product.brandOrigin}
         model={product.model}
+        star={product.star}
         colors={product.colors ?? []}
         images={product.images}
         thumbSrc={product.thumb_src}
         thumbAlt={product.thumb_alt ?? product.title}
+        videoUrl={product.videoUrl}
+        videoPoster={product.videoPoster ?? (product as Record<string, unknown>).video_poster ?? (product as Record<string, unknown>).videoThumbnail ?? (product as Record<string, unknown>).video_thumbnail ?? undefined}
         shortDescription={product.shortDescription}
         full_description={product.full_description}
         description={product.description}
@@ -123,6 +127,7 @@ export default function ProductPageFirebase({ productId }: Props) {
                 <CardProduct
                 thumb_src={p.thumb_src}
                 thumb_alt={p.thumb_alt ?? p.title}
+                videoUrl={p.videoUrl}
                 color={p.color}
                 colors={p.colors}
                 size={p.size}
@@ -134,6 +139,7 @@ export default function ProductPageFirebase({ productId }: Props) {
                 position="left"
                 productId={p.id}
                 stock={p.stock}
+                star={p.star}
               />
               </div>
             ))}

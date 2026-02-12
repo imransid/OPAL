@@ -15,6 +15,10 @@ interface Props {
   position: string;
   productId?: string;
   stock?: boolean;
+  /** When set, show a play icon on the card image */
+  videoUrl?: string;
+  /** When true, show a star badge (featured product) */
+  star?: boolean;
 }
 
 export default function CardProduct({
@@ -31,6 +35,8 @@ export default function CardProduct({
   position,
   productId,
   stock = true,
+  videoUrl,
+  star,
 }: Props) {
   const classList = 'card-body d-flex flex-column text-' + position;
   const productUrl = productId ? `/product/?id=${productId}` : '#';
@@ -64,6 +70,16 @@ export default function CardProduct({
           >
             No image
           </div>
+          {videoUrl?.trim() && (
+            <span className="position-absolute bottom-0 end-0 m-2 rounded-circle bg-dark bg-opacity-75 d-flex align-items-center justify-content-center text-white" style={{ width: 40, height: 40 }} aria-hidden>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            </span>
+          )}
+          {star && (
+            <span className="position-absolute top-0 start-0 m-2 text-warning" style={{ fontSize: '1.25rem' }} title="Featured" aria-label="Featured">
+              ★
+            </span>
+          )}
         </div>
         <div className={classList} style={{ flex: '1 1 auto' }}>
           {color && <h6 className="text-uppercase small mb-1 text-body-secondary">{color}</h6>}

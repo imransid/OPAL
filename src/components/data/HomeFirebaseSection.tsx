@@ -68,6 +68,7 @@ export default function HomeFirebaseSection() {
                   <CardProduct
                     thumb_src={product.thumb_src}
                     thumb_alt={product.thumb_alt || product.title}
+                    videoUrl={product.videoUrl}
                     color={product.color}
                     colors={product.colors}
                     size={product.size}
@@ -77,6 +78,7 @@ export default function HomeFirebaseSection() {
                     price={product.price}
                     position="center"
                     productId={product.id}
+                    star={product.star}
                   />
                 </div>
               ))

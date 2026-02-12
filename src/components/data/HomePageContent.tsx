@@ -73,11 +73,30 @@ export default function HomePageContent() {
     productCountByCategory[c.id] = inStockProducts.filter((p) => p.categoryId === c.id).length;
   });
 
+  // Collection-wise: map collection name -> category ids (for filtering products)
+  const collectionToCategoryIds: Record<string, string[]> = {};
+  categories.forEach((c) => {
+    const col = (c.collection || c.title || '').trim() || 'default';
+    if (!collectionToCategoryIds[col]) collectionToCategoryIds[col] = [];
+    collectionToCategoryIds[col].push(c.id);
+  });
+  // Unique collections that have at least one in-stock product (for Best Sellers pills)
+  const collectionsWithProducts = Object.keys(collectionToCategoryIds).filter((col) =>
+    inStockProducts.some((p) => p.categoryId && collectionToCategoryIds[col].includes(p.categoryId))
+  );
+  const bestSellerCollectionOptions = [{ id: 'all', title: 'All' }].concat(
+    collectionsWithProducts.map((col) => ({ id: col, title: col }))
+  );
+
   const bestSellerProducts =
     bestSellerFilter === 'all'
       ? inStockProducts.slice(0, 8)
-      : inStockProducts.filter((p) => p.categoryId === bestSellerFilter).slice(0, 8);
-  const bestSellerCategories = [{ id: 'all', title: 'All' }, ...displayCategories];
+      : inStockProducts.filter((p) => {
+          if (!p.categoryId) return false;
+          const categoryIds = collectionToCategoryIds[bestSellerFilter];
+          return categoryIds && categoryIds.includes(p.categoryId);
+        }).slice(0, 8);
+  const bestSellerCategories = bestSellerCollectionOptions;
 
   if (loading) {
     return (
@@ -651,6 +670,7 @@ export default function HomePageContent() {
                   <CardProduct
                     thumb_src={product.thumb_src}
                     thumb_alt={product.thumb_alt || product.title}
+                    videoUrl={product.videoUrl}
                     color={product.color}
                     colors={product.colors}
                     size={product.size}
@@ -662,6 +682,7 @@ export default function HomePageContent() {
                     position="center"
                     productId={product.id}
                     stock={product.stock}
+                    star={product.star}
                   />
                 </div>
               ))}
@@ -704,6 +725,7 @@ export default function HomePageContent() {
                 <CardProduct
                   thumb_src={product.thumb_src}
                   thumb_alt={product.thumb_alt || product.title}
+                  videoUrl={product.videoUrl}
                   color={product.color}
                   colors={product.colors}
                   size={product.size}
@@ -715,6 +737,7 @@ export default function HomePageContent() {
                   position="center"
                   productId={product.id}
                   stock={product.stock}
+                  star={product.star}
                 />
               </div>
             ))}

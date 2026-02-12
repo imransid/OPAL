@@ -40,6 +40,10 @@ export interface Product {
   currency?: string;
   thumb_src: string;
   thumb_alt?: string;
+  /** Optional product video URL (MP4, WebM, or YouTube/Vimeo). Shown with poster image and play overlay. */
+  videoUrl?: string;
+  /** Optional poster image URL for video; falls back to thumb_src if not set. */
+  videoPoster?: string;
   images?: ProductImage[];
   color?: string;
   colors?: string[];
@@ -56,8 +60,12 @@ export interface Product {
   specifications?: Record<string, string | number | boolean>;
   featuresDetails?: Record<string, string>;
   brand?: string;
+  /** Product brand origin (e.g. China, Japan, Malaysia) */
+  brandOrigin?: string;
   model?: string;
   slug?: string;
+  /** When true, show as starred/featured product */
+  star?: boolean;
   /** Admin-only: not displayed on storefront */
   resource?: string;
   delivery?: ProductDelivery;
@@ -113,4 +121,14 @@ export interface Order {
   currency: string;
   status: OrderStatus;
   createdAt: ReturnType<typeof Date.now>;
+}
+
+/** Full DB backup for Export / Import (Dashboard) */
+export interface BackupData {
+  version: number;
+  exportedAt: string;
+  products: Product[];
+  categories: Category[];
+  orders: Order[];
+  storeSettings: StoreSettings;
 }

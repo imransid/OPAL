@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { getProducts, getCategories, getAllOrders } from '../../lib/firestore';
-import type { Product, Category, Order } from '../../lib/types';
+import { useState, useEffect, useRef } from 'react';
+import { getProducts, getCategories, getAllOrders, exportBackup, restoreBackup } from '../../lib/firestore';
+import type { Product, Category, Order, BackupData } from '../../lib/types';
 import AdminProducts from './AdminProducts';
 import AdminCategories from './AdminCategories';
 import AdminSettings from './AdminSettings';
@@ -35,6 +35,11 @@ export default function AdminGate({ adminEmail }: Props) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [dashboardLoading, setDashboardLoading] = useState(false);
+  const [backupExporting, setBackupExporting] = useState(false);
+  const [backupImporting, setBackupImporting] = useState(false);
+  const [backupImportError, setBackupImportError] = useState('');
+  const [backupImportFile, setBackupImportFile] = useState<BackupData | null>(null);
+  const backupFileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const stored = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(ADMIN_STORAGE_KEY) : null;
@@ -56,6 +61,72 @@ export default function AdminGate({ adminEmail }: Props) {
       .finally(() => { if (!cancelled) setDashboardLoading(false); });
     return () => { cancelled = true; };
   }, [isAdmin, adminView]);
+
+  const handleExportBackup = async () => {
+    setBackupExporting(true);
+    setBackupImportError('');
+    try {
+      const backup = await exportBackup();
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `opal-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      setBackupImportError(e instanceof Error ? e.message : 'Export failed');
+    } finally {
+      setBackupExporting(false);
+    }
+  };
+
+  const handleBackupFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    setBackupImportFile(null);
+    setBackupImportError('');
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const json = JSON.parse(reader.result as string) as BackupData;
+        if (json.version == null || !Array.isArray(json.products) || !Array.isArray(json.categories) || !Array.isArray(json.orders)) {
+          setBackupImportError('Invalid backup file: missing version, products, categories, or orders.');
+          return;
+        }
+        setBackupImportFile(json);
+      } catch {
+        setBackupImportError('Invalid JSON file.');
+      }
+    };
+    reader.readAsText(file);
+    if (backupFileInputRef.current) backupFileInputRef.current.value = '';
+  };
+
+  const handleRestoreBackup = async () => {
+    if (!backupImportFile) return;
+    if (!confirm('This will replace ALL current products, categories, orders, and settings with the backup. Continue?')) return;
+    setBackupImporting(true);
+    setBackupImportError('');
+    try {
+      await restoreBackup(backupImportFile);
+      setBackupImportFile(null);
+      const [p, c, o] = await Promise.all([getProducts(), getCategories(), getAllOrders()]);
+      setProducts(p);
+      setCategories(c);
+      setOrders(o);
+    } catch (e) {
+      setBackupImportError(e instanceof Error ? e.message : 'Restore failed');
+    } finally {
+      setBackupImporting(false);
+    }
+  };
+
+  const clearBackupImport = () => {
+    setBackupImportFile(null);
+    setBackupImportError('');
+    if (backupFileInputRef.current) backupFileInputRef.current.value = '';
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -484,6 +555,58 @@ export default function AdminGate({ adminEmail }: Props) {
                         <button type="button" className="btn btn-outline-dark" onClick={() => setAdminView('categories')}>Manage categories</button>
                         <button type="button" className="btn btn-outline-dark" onClick={() => setAdminView('orders')}>Manage orders</button>
                       </div>
+                    </div>
+                  </div>
+                  <div className="card border-0 shadow-sm mb-4">
+                    <div className="card-header bg-white border-0 pt-4">
+                      <h5 className="mb-0">Backup &amp; Restore</h5>
+                    </div>
+                    <div className="card-body">
+                      <p className="text-body-secondary small mb-3">
+                        Export all products, categories, orders, and settings to a JSON file, or restore from a previous backup.
+                      </p>
+                      <div className="d-grid gap-2 mb-3">
+                        <button
+                          type="button"
+                          className="btn btn-outline-primary"
+                          onClick={handleExportBackup}
+                          disabled={backupExporting}
+                        >
+                          {backupExporting ? 'Exporting…' : 'Download backup (JSON)'}
+                        </button>
+                        <div>
+                          <input
+                            ref={backupFileInputRef}
+                            type="file"
+                            className="form-control form-control-sm"
+                            accept=".json,application/json"
+                            onChange={handleBackupFileSelect}
+                            aria-label="Choose backup file"
+                          />
+                        </div>
+                        {backupImportFile && (
+                          <div className="d-flex align-items-center gap-2 flex-wrap">
+                            <span className="small text-success">
+                              {backupImportFile.products?.length ?? 0} products, {backupImportFile.categories?.length ?? 0} categories, {backupImportFile.orders?.length ?? 0} orders
+                              {backupImportFile.exportedAt && ` (exported ${backupImportFile.exportedAt.slice(0, 10)})`}
+                            </span>
+                            <button
+                              type="button"
+                              className="btn btn-sm btn-danger"
+                              onClick={handleRestoreBackup}
+                              disabled={backupImporting}
+                            >
+                              {backupImporting ? 'Restoring…' : 'Restore this backup'}
+                            </button>
+                            <button type="button" className="btn btn-sm btn-outline-secondary" onClick={clearBackupImport}>
+                              Cancel
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                      {backupImportError && (
+                        <div className="alert alert-danger py-2 small mb-0">{backupImportError}</div>
+                      )}
                     </div>
                   </div>
                   <div className="card border-0 shadow-sm">

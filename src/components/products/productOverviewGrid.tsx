@@ -15,11 +15,15 @@ interface Props {
   productId?: string;
   title: string;
   brand?: string;
+  brandOrigin?: string;
   model?: string;
+  star?: boolean;
   colors?: string[];
   images?: ProductImage[];
   thumbSrc?: string;
   thumbAlt?: string;
+  videoUrl?: string;
+  videoPoster?: string;
   shortDescription?: string;
   full_description?: string;
   description?: string;
@@ -44,11 +48,15 @@ export default function ProductOverview({
   productId,
   title,
   brand,
+  brandOrigin,
   model,
+  star,
   colors = [],
   images = [],
   thumbSrc,
   thumbAlt,
+  videoUrl,
+  videoPoster,
   shortDescription,
   full_description,
   description,
@@ -87,12 +95,18 @@ export default function ProductOverview({
   return (
     <article className="product-overview">
       <div className="row align-items-start g-4 g-lg-5">
-        <ProductGallery images={images} thumbSrc={thumbSrc} thumbAlt={thumbAlt} />
+        <ProductGallery images={images} thumbSrc={thumbSrc} thumbAlt={thumbAlt} videoUrl={videoUrl} videoPoster={videoPoster} />
         <div className="col-12 col-lg-6">
           <div className="product-details sticky-top pt-lg-2" style={{ top: '1rem' }}>
-            {brand && (
-              <p className="text-uppercase text-body-secondary small mb-1 opacity-75" style={{ letterSpacing: '0.06em' }}>
-                {brand}{model ? ` · ${model}` : ''}
+            {(brand || brandOrigin || star) && (
+              <p className="text-uppercase text-body-secondary small mb-1 opacity-75 d-flex align-items-center gap-2 flex-wrap" style={{ letterSpacing: '0.06em' }}>
+                {star && (
+                  <span className="text-warning" title="Featured product" aria-label="Featured">
+                    ★
+                  </span>
+                )}
+                {brand && <span>{brand}{model ? ` · ${model}` : ''}</span>}
+                {brandOrigin && <span className="text-body-tertiary">· {brandOrigin}</span>}
               </p>
             )}
             {title && <h1 className="h3 fs-2 mb-3 fw-semibold">{title}</h1>}

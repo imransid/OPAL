@@ -242,9 +242,10 @@ export default function ShopFirebaseContent() {
             <div className="row g-3 g-sm-4">
               {filteredProducts.map((product) => (
                 <div key={product.id} className="col-6 col-sm-6 col-md-4 col-lg-4 col-xl-3 d-flex">
-                  <CardProduct
-                    thumb_src={product.thumb_src || product.images?.[0]?.src || ''}
-                    thumb_alt={product.thumb_alt ?? product.title}
+<CardProduct
+                  thumb_src={product.thumb_src || product.images?.[0]?.src || ''}
+                  thumb_alt={product.thumb_alt ?? product.title}
+                  videoUrl={product.videoUrl}
                     color={product.color}
                     colors={product.colors}
                     size={product.size}
@@ -256,6 +257,7 @@ export default function ShopFirebaseContent() {
                     position="left"
                     productId={product.id}
                     stock={product.stock}
+                    star={product.star}
                   />
                 </div>
               ))}

@@ -12,7 +12,7 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { getDb } from './firebase';
-import type { Product, Category, StoreSettings, Order, OrderItem } from './types';
+import type { Product, Category, StoreSettings, Order, OrderItem, BackupData } from './types';
 
 const PRODUCTS = 'products';
 const CATEGORIES = 'categories';
@@ -36,6 +36,19 @@ function normalizeProduct(docData: Record<string, unknown>, id: string): Product
   }
   if (updatedAt != null && typeof updatedAt === 'object' && 'toMillis' in updatedAt && typeof (updatedAt as { toMillis: () => number }).toMillis === 'function') {
     data.updatedAt = (updatedAt as { toMillis: () => number }).toMillis();
+  }
+  // Normalize video thumbnail from Firebase DB (Firestore field can be any of these)
+  const raw = data as Record<string, unknown>;
+  const videoThumbnailRaw =
+    raw.videoPoster ?? raw.video_poster ?? raw.videoThumbnail ?? raw.video_thumbnail;
+  const videoThumbnailStr =
+    videoThumbnailRaw != null && typeof videoThumbnailRaw === 'string'
+      ? String(videoThumbnailRaw).trim()
+      : '';
+  if (videoThumbnailStr.length > 0) {
+    data.videoPoster = videoThumbnailStr;
+  } else {
+    data.videoPoster = undefined;
   }
   // Normalize size/color from Firebase so UI can always show them
   if (!Array.isArray(data.colors)) data.colors = [];
@@ -286,4 +299,103 @@ export async function deleteOrder(orderId: string): Promise<void> {
   const db = getDb();
   if (!db) throw new Error('Firebase not configured');
   await deleteDoc(doc(db, ORDERS, orderId));
+}
+
+// --- Backup (Export / Restore) ---
+
+export async function exportBackup(): Promise<BackupData> {
+  const [products, categories, orders, storeSettings] = await Promise.all([
+    getProducts(),
+    getCategories(),
+    getAllOrders(),
+    getStoreSettings(),
+  ]);
+  return {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    products,
+    categories,
+    orders,
+    storeSettings: storeSettings ?? {},
+  };
+}
+
+/** Convert numeric ms to Firestore Timestamp for restore */
+function toTimestamp(value: unknown): unknown {
+  if (typeof value === 'number' && !Number.isNaN(value)) {
+    return Timestamp.fromMillis(value);
+  }
+  if (value != null && typeof value === 'object' && 'seconds' in (value as object)) {
+    const v = value as { seconds: number; nanoseconds?: number };
+    return Timestamp.fromMillis(v.seconds * 1000 + ((v.nanoseconds ?? 0) / 1e6));
+  }
+  return value;
+}
+
+/** Write product with given id (for restore). Omits id from body; converts createdAt/updatedAt to Timestamp. */
+export async function setProductWithId(id: string, data: Product): Promise<void> {
+  const db = getDb();
+  if (!db) throw new Error('Firebase not configured');
+  const { id: _id, ...rest } = data;
+  const payload: Record<string, unknown> = { ...omitUndefined(rest as Record<string, unknown>) };
+  if (payload.createdAt != null) payload.createdAt = toTimestamp(payload.createdAt);
+  if (payload.updatedAt != null) payload.updatedAt = toTimestamp(payload.updatedAt);
+  await setDoc(doc(db, PRODUCTS, id), payload);
+}
+
+/** Write category with given id (for restore). */
+export async function setCategoryWithId(id: string, data: Category): Promise<void> {
+  const db = getDb();
+  if (!db) throw new Error('Firebase not configured');
+  const { id: _id, ...rest } = data;
+  await setDoc(doc(db, CATEGORIES, id), omitUndefined(rest as Record<string, unknown>));
+}
+
+/** Write order with given id (for restore). Converts createdAt to Timestamp. */
+export async function setOrderWithId(id: string, data: Order): Promise<void> {
+  const db = getDb();
+  if (!db) throw new Error('Firebase not configured');
+  const { id: _id, ...rest } = data;
+  const payload: Record<string, unknown> = { ...omitUndefined(rest as Record<string, unknown>) };
+  if (payload.createdAt != null) payload.createdAt = toTimestamp(payload.createdAt);
+  await setDoc(doc(db, ORDERS, id), payload);
+}
+
+/** Overwrite store settings from backup. */
+export async function setStoreSettingsFromBackup(settings: StoreSettings): Promise<void> {
+  const db = getDb();
+  if (!db) throw new Error('Firebase not configured');
+  const ref = doc(db, STORE_SETTINGS, SETTINGS_DOC_ID);
+  await setDoc(ref, omitUndefined(settings as Record<string, unknown>));
+}
+
+/** Delete all documents in a collection (for full replace before restore). */
+async function deleteAllInCollection(collectionName: string): Promise<void> {
+  const db = getDb();
+  if (!db) throw new Error('Firebase not configured');
+  const snap = await getDocs(collection(db, collectionName));
+  await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)));
+}
+
+/** Restore full DB from backup. Replaces all products, categories, orders, and settings. */
+export async function restoreBackup(backup: BackupData): Promise<void> {
+  const db = getDb();
+  if (!db) throw new Error('Firebase not configured');
+
+  await deleteAllInCollection(PRODUCTS);
+  await deleteAllInCollection(CATEGORIES);
+  await deleteAllInCollection(ORDERS);
+
+  for (const cat of backup.categories ?? []) {
+    if (cat?.id) await setCategoryWithId(cat.id, cat);
+  }
+  for (const product of backup.products ?? []) {
+    if (product?.id) await setProductWithId(product.id, product);
+  }
+  for (const order of backup.orders ?? []) {
+    if (order?.id) await setOrderWithId(order.id, order);
+  }
+  if (backup.storeSettings && typeof backup.storeSettings === 'object') {
+    await setStoreSettingsFromBackup(backup.storeSettings);
+  }
 }
