@@ -29,14 +29,30 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  const site = getSiteUrl();
-  const orgJsonLd = {
+  const site = getSiteUrl().replace(/\/$/, '');
+  const orgId = `${site}/#organization`;
+  const webId = `${site}/#website`;
+  const siteJsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Organization',
-    name: SEO.siteName,
-    url: site,
-    description: SEO.defaultDescription,
-    logo: fullUrl('/favicon.svg', site),
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': orgId,
+        name: SEO.siteName,
+        url: site,
+        description: SEO.defaultDescription,
+        logo: fullUrl('/favicon.svg', site),
+      },
+      {
+        '@type': 'WebSite',
+        '@id': webId,
+        url: site,
+        name: SEO.siteName,
+        description: SEO.defaultDescription,
+        inLanguage: SEO.locale.replace('_', '-'),
+        publisher: { '@id': orgId },
+      },
+    ],
   };
 
   return (
@@ -48,7 +64,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body>
-        <JsonLd data={orgJsonLd} />
+        <JsonLd data={siteJsonLd} />
         <Providers>{children}</Providers>
         <Script
           src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"

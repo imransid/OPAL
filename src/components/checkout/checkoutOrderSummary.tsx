@@ -78,6 +78,39 @@ export default function CheckoutSummary({
         shippingCost: shipping,
         currency,
       });
+
+      try {
+        await fetch('/api/notify-new-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderNumber,
+            contact: { email: email.trim(), phone: phone.trim() },
+            shipping: {
+              address: address.trim(),
+              city: city || undefined,
+              state: state || undefined,
+              postalCode: postalCode || undefined,
+            },
+            items: products.map((p) => ({
+              title: p.title,
+              quantity: p.quantity,
+              price: p.price,
+              subtotal: p.subtotal,
+              color: p.color || undefined,
+              size: p.size || undefined,
+            })),
+            subtotal,
+            shippingCost: shipping,
+            total: subtotal + shipping,
+            currency,
+            paymentMethod,
+          }),
+        });
+      } catch {
+        /* Store owner notification is best-effort; order is already saved */
+      }
+
       clearCart();
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('opal-cart-update'));

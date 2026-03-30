@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { getProducts, getCategories, getAllOrders, exportBackup, restoreBackup } from '../../lib/firestore';
+import { productPath } from '../../lib/productPath';
 import type { Product, Category, Order, BackupData } from '../../lib/types';
 import AdminProducts from './AdminProducts';
 import AdminCategories from './AdminCategories';
@@ -535,7 +536,7 @@ export default function AdminGate({ adminEmail }: Props) {
                                     </span>
                                   </td>
                                   <td>
-                                    <a href={`/product?id=${product.id}`} className="btn btn-sm btn-outline-primary" target="_blank" rel="noopener noreferrer">View</a>
+                                    <a href={productPath(product.id)} className="btn btn-sm btn-outline-primary" target="_blank" rel="noopener noreferrer">View</a>
                                   </td>
                                 </tr>
                               ))

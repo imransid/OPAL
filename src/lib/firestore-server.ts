@@ -4,9 +4,10 @@
  */
 import { doc, getDoc, collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { getServerDb } from './firebase-server';
-import type { Product } from './types';
+import type { Category, Product } from './types';
 
 const PRODUCTS = 'products';
+const CATEGORIES = 'categories';
 
 export async function getProductServer(id: string): Promise<Product | null> {
   if (!id) return null;
@@ -19,6 +20,21 @@ export async function getProductServer(id: string): Promise<Product | null> {
     return { id: snap.id, ...snap.data() } as Product;
   } catch (e) {
     console.error('[opal] getProductServer:', e);
+    return null;
+  }
+}
+
+export async function getCategoryServer(id: string): Promise<Category | null> {
+  if (!id) return null;
+  try {
+    const db = getServerDb();
+    if (!db) return null;
+    const ref = doc(db, CATEGORIES, id);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return null;
+    return { id: snap.id, ...snap.data() } as Category;
+  } catch (e) {
+    console.error('[opal] getCategoryServer:', e);
     return null;
   }
 }

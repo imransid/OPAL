@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { getProducts, getCategories, createProduct, updateProduct, deleteProduct } from '../../lib/firestore';
 import { jsonToProduct, type ProductJsonInput } from '../../lib/product-json';
+import { productPath } from '../../lib/productPath';
 import { parseProductFile, downloadTemplate, type ParsedProduct } from '../../lib/product-file-parser';
 import type { Product, Category } from '../../lib/types';
 
@@ -834,7 +835,7 @@ export default function AdminProducts() {
                 </div>
               </div>
               <div className="modal-footer">
-                <a href={`/product?id=${viewProduct.id}`} target="_blank" rel="noopener noreferrer" className="btn btn-outline-primary">Open on site</a>
+                <a href={productPath(viewProduct.id)} target="_blank" rel="noopener noreferrer" className="btn btn-outline-primary">Open on site</a>
                 <button type="button" className="btn btn-secondary" onClick={() => setViewProduct(null)}>Close</button>
                 <button type="button" className="btn btn-dark" onClick={() => { setViewProduct(null); openEdit(viewProduct); }}>Edit</button>
                 <button type="button" className="btn btn-outline-danger" onClick={async () => { await handleDelete(viewProduct.id); setViewProduct(null); }}>Delete</button>

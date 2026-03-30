@@ -1,6 +1,7 @@
 import ProductBadge from './productBadge';
-import { toImageSrc } from '../../lib/image-utils';
 import { formatCardPrice } from '../../lib/formatPrice';
+import { toImageSrc } from '../../lib/image-utils';
+import { productPath } from '../../lib/productPath';
 
 interface Props {
   thumb_src: string;
@@ -48,7 +49,7 @@ export default function CardProduct({
   star,
 }: Props) {
   const classList = 'card-body d-flex flex-column text-' + position;
-  const productUrl = productId ? `/product?id=${productId}` : '#';
+  const productUrl = productId ? productPath(productId) : '#';
   const imgSrc = thumb_src ? toImageSrc(thumb_src) : '';
   const showColorLabel = Boolean(color?.trim() && !(colors && colors.length > 0));
   const sizesLine = formatSizesLine(size, sizes);

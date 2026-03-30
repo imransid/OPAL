@@ -45,6 +45,8 @@ export function fullUrl(path: string, site?: string): string {
 export function rootMetadata(): Metadata {
   const site = getSiteUrl();
   const ogImage = publicUrl(SEO.defaultImage);
+  const googleVerify = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
+
   return {
     metadataBase: metadataBaseUrl(site),
     title: {
@@ -57,6 +59,7 @@ export function rootMetadata(): Metadata {
     creator: SEO.siteName,
     publisher: SEO.siteName,
     formatDetection: { email: false, address: false, telephone: false },
+    ...(googleVerify ? { verification: { google: googleVerify } } : {}),
     openGraph: {
       type: 'website',
       locale: SEO.locale,

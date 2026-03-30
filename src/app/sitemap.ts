@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 
 import { getProductsServer } from '@/lib/firestore-server';
+import { productPath } from '@/lib/productPath';
 import { getSiteUrl } from '@/lib/siteUrl';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -19,8 +20,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     productRoutes = products
       .filter((p) => p.id)
       .map((p) => ({
-        url: `${base}/product?id=${encodeURIComponent(p.id)}`,
-        lastModified: new Date(),
+        url: `${base}${productPath(p.id)}`,
+        lastModified: new Date(
+          typeof p.updatedAt === 'number'
+            ? p.updatedAt
+            : typeof p.createdAt === 'number'
+              ? p.createdAt
+              : Date.now(),
+        ),
         changeFrequency: 'weekly' as const,
         priority: 0.8,
       }));
