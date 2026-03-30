@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 64 64" aria-hidden="true">
+  <defs>
+    <linearGradient id="fb" x1="10" y1="8" x2="54" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f7f2e8"/>
+      <stop offset="0.35" stop-color="#d4c4a8"/>
+      <stop offset="0.55" stop-color="#8e7cac"/>
+      <stop offset="0.78" stop-color="#3d3552"/>
+      <stop offset="1" stop-color="#121018"/>
+    </linearGradient>
+    <linearGradient id="fe" x1="9" y1="18" x2="55" y2="48" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ece5d8" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#9a8b78" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#2a2438" stop-opacity="0.9"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#fb)" fill-rule="evenodd" stroke="url(#fe)" stroke-width="0.65" stroke-linejoin="round" d="M32 6 L54.516 19 L54.516 45 L32 58 L9.484 45 L9.484 19 Z M43.5 32 A11.5 11.5 0 1 1 20.5 32 A11.5 11.5 0 1 1 43.5 32"/>
+  <path fill="#e3d5b8" d="M32 6 L27 14.5 h10 Z"/>
+</svg>

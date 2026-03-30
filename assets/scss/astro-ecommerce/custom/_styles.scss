@@ -1,0 +1,329 @@
+.pagination .active .page-link {
+  color: $white;
+}
+
+.z-index-10 {
+  z-index: 10 !important;
+}
+
+// —— OPAL — premium tokens (quiet luxury, fashion × tech) ——
+:root {
+  --opal-ink: #0c0b0d;
+  --opal-ink-soft: #1c1b1f;
+  --opal-ink-muted: rgba(12, 11, 13, 0.55);
+  --opal-surface: #f5f3f0;
+  --opal-surface-warm: #faf9f7;
+  --opal-surface-elevated: #ffffff;
+  --opal-line: rgba(12, 11, 13, 0.08);
+  --opal-line-strong: rgba(12, 11, 13, 0.12);
+  --opal-champagne: #c4a574;
+  --opal-champagne-soft: rgba(196, 165, 116, 0.35);
+  --opal-fashion: #9f1239;
+  --opal-tech: #0e7490;
+  --opal-accent-muted: #57534e;
+  --opal-radius-lg: 1rem;
+  --opal-radius-xl: 1.375rem;
+  --opal-shadow-card:
+    0 0 0 1px var(--opal-line),
+    0 2px 4px rgba(12, 11, 13, 0.02),
+    0 12px 40px rgba(12, 11, 13, 0.06);
+  --opal-shadow-card-hover:
+    0 0 0 1px var(--opal-line-strong),
+    0 4px 8px rgba(12, 11, 13, 0.03),
+    0 24px 56px rgba(12, 11, 13, 0.09);
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  color: var(--opal-ink);
+  background-color: var(--opal-surface-warm);
+  letter-spacing: 0.01em;
+}
+
+.opal-navbar {
+  backdrop-filter: blur(24px) saturate(1.15);
+  -webkit-backdrop-filter: blur(24px) saturate(1.15);
+  background: rgba(250, 249, 247, 0.82) !important;
+  border-bottom: 1px solid var(--opal-line) !important;
+  box-shadow: none !important;
+}
+
+.opal-navbar .navbar-brand {
+  letter-spacing: 0.18em;
+  font-weight: 500;
+  font-size: 1.125rem;
+  color: var(--opal-ink) !important;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.opal-navbar .opal-nav-tagline {
+  font-family: $font-family-sans-serif;
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--opal-ink-muted);
+  display: block;
+  margin-top: 0.35rem;
+}
+
+.opal-navbar .nav-link {
+  font-family: $font-family-sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--opal-ink-muted) !important;
+  padding: 0.5rem 0.9rem !important;
+  border-radius: 9999px;
+  transition:
+    background 0.35s ease,
+    color 0.35s ease;
+}
+
+.opal-navbar .nav-link:hover,
+.opal-navbar .nav-link:focus {
+  background: rgba(12, 11, 13, 0.04);
+  color: var(--opal-ink) !important;
+}
+
+.opal-navbar .opal-nav-cta {
+  background: transparent !important;
+  color: var(--opal-ink) !important;
+  border: 1px solid var(--opal-line-strong) !important;
+  margin-left: 0.35rem;
+  letter-spacing: 0.1em;
+  font-size: 0.6875rem !important;
+  padding: 0.55rem 1.15rem !important;
+  box-shadow: none !important;
+}
+
+.opal-navbar .opal-nav-cta:hover {
+  background: var(--opal-ink) !important;
+  border-color: var(--opal-ink) !important;
+  color: #fff !important;
+}
+
+.opal-product-card {
+  border-radius: var(--opal-radius-lg) !important;
+  box-shadow: var(--opal-shadow-card) !important;
+  background: var(--opal-surface-elevated) !important;
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.opal-product-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--opal-shadow-card-hover) !important;
+}
+
+.opal-product-card .opal-product-card-media {
+  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.opal-product-card:hover .opal-product-card-media {
+  transform: scale(1.03);
+}
+
+.opal-card-body-premium {
+  padding: 1.125rem 1.25rem 1.35rem !important;
+}
+
+.opal-card-title {
+  font-family: $headings-font-family;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-size: 0.9375rem !important;
+  line-height: 1.35 !important;
+  color: var(--opal-ink-soft) !important;
+}
+
+.opal-card-price {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  font-size: 0.8125rem !important;
+  color: var(--opal-ink) !important;
+}
+
+.opal-card-meta {
+  font-size: 0.6875rem !important;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--opal-ink-muted) !important;
+}
+
+// —— Product cards (shop grid): calmer mobile, consistent price ——
+.opal-product-card-link:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--opal-surface-elevated),
+    0 0 0 4px rgba(196, 165, 116, 0.55);
+  border-radius: 0 0 var(--opal-radius-lg) var(--opal-radius-lg);
+}
+
+.opal-product-card-media-wrap {
+  border-radius: var(--opal-radius-lg) var(--opal-radius-lg) 0 0;
+}
+
+.opal-product-card-badge {
+  top: 0.5rem;
+  left: 0.5rem;
+  padding: 0.28rem 0.45rem;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: rgba(250, 249, 247, 0.94);
+  color: var(--opal-ink);
+  border: 1px solid var(--opal-line);
+  border-radius: 0.35rem;
+}
+
+.opal-product-card-play {
+  bottom: 0.5rem;
+  right: 0.5rem;
+  width: 2rem;
+  height: 2rem;
+  background-color: rgba(12, 11, 13, 0.52);
+  backdrop-filter: blur(8px);
+}
+
+.opal-card-title--product {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 3;
+  line-height: 1.35 !important;
+  margin: 0 !important;
+}
+
+.opal-card-desc {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  color: var(--opal-ink-muted);
+  font-weight: 400;
+}
+
+.opal-card-sizes {
+  text-transform: none !important;
+  letter-spacing: 0.02em !important;
+  line-height: 1.35;
+}
+
+.opal-card-stock--warn {
+  margin-top: 0.35rem !important;
+  color: var(--opal-fashion) !important;
+}
+
+.opal-card-stock--ok {
+  margin-top: 0.35rem !important;
+}
+
+.opal-card-buy-row {
+  border-top: 1px solid transparent;
+}
+
+@media (max-width: 767.98px) {
+  .opal-product-card {
+    border-radius: 0.875rem !important;
+  }
+
+  .opal-product-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .opal-product-card--grid .opal-card-body-premium {
+    padding: 0.72rem 0.68rem 0.85rem !important;
+  }
+
+  .opal-product-card-badge {
+    top: 0.4rem;
+    left: 0.4rem;
+    padding: 0.22rem 0.38rem;
+    font-size: 0.5rem;
+    letter-spacing: 0.1em;
+  }
+
+  .opal-product-card-play {
+    bottom: 0.4rem;
+    right: 0.4rem;
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  .opal-product-card-play svg {
+    width: 0.8rem;
+    height: 0.8rem;
+  }
+
+  .opal-card-title--product {
+    font-size: 0.8125rem !important;
+    line-height: 1.38 !important;
+    -webkit-line-clamp: 3;
+  }
+
+  .opal-card-meta--product {
+    font-size: 0.625rem !important;
+    letter-spacing: 0.1em !important;
+  }
+
+  .opal-card-sizes {
+    font-size: 0.625rem !important;
+    margin-bottom: 0.35rem !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .opal-card-swatches .product-color-swatch {
+    width: 1.125rem !important;
+    height: 1.125rem !important;
+    border-width: 1.5px !important;
+  }
+
+  .opal-card-swatches {
+    margin-bottom: 0.35rem !important;
+  }
+
+  .opal-card-price--product {
+    font-size: 0.9375rem !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.01em;
+  }
+
+  .opal-card-buy-row {
+    border-top-color: transparent;
+    padding-top: 0.35rem !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .opal-card-title--product {
+    -webkit-line-clamp: 2;
+    font-size: 0.9375rem !important;
+  }
+
+  .opal-card-buy-row {
+    border-top-color: var(--opal-line);
+    padding-top: 0.85rem !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .opal-product-card,
+  .opal-product-card:hover {
+    transition: none;
+    transform: none;
+    box-shadow: var(--opal-shadow-card) !important;
+  }
+  .opal-product-card:hover .opal-product-card-media {
+    transform: none;
+  }
+}

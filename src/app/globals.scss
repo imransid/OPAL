@@ -1,0 +1,50 @@
+@import '../../assets/scss/astro-ecommerce.scss';
+
+.opal-logo-mark {
+  width: 2.375rem;
+  height: auto;
+  filter: drop-shadow(0 1px 1px rgba(10, 8, 14, 0.06)) drop-shadow(0 6px 16px rgba(40, 32, 58, 0.1));
+}
+
+.opal-logo-lockup {
+  gap: 0.625rem !important;
+}
+
+.opal-logo-text {
+  padding-left: 0.625rem;
+  margin-left: 0.125rem;
+  border-left: 1px solid rgba(18, 16, 24, 0.08);
+  min-height: 2.125rem;
+}
+
+.opal-logo-name {
+  font-family: var(--font-syne), 'Syne', system-ui, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.34em;
+  line-height: 1;
+  text-indent: 0.34em;
+  font-feature-settings: 'kern' 1, 'liga' 1, 'ss01' 1;
+  background: linear-gradient(125deg, #08070a 0%, #242030 42%, #120f18 58%, #4a3f62 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.opal-logo-sub {
+  font-family: var(--font-plus-jakarta), 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  color: #6f697c;
+  margin-top: 0.35rem;
+  opacity: 0.88;
+  line-height: 1.2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .opal-logo-mark {
+    filter: none;
+  }
+}

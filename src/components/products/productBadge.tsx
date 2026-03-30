@@ -1,0 +1,79 @@
+interface Props {
+  colors: string[];
+  selectedColor?: string;
+  onSelectColor?: (color: string) => void;
+  /** Smaller swatches for dense grids (e.g. mobile shop) */
+  compact?: boolean;
+}
+
+const COLOR_MAP: Record<string, string> = {
+  red: '#dc3545',
+  blue: '#0d6efd',
+  green: '#198754',
+  black: '#212529',
+  white: '#f8f9fa',
+  yellow: '#ffc107',
+  orange: '#fd7e14',
+  pink: '#d63384',
+  purple: '#6f42c1',
+  grey: '#6c757d',
+  gray: '#6c757d',
+  navy: '#001f3f',
+  brown: '#795548',
+};
+
+function getColorHex(name: string): string {
+  const key = name.trim().toLowerCase();
+  return COLOR_MAP[key] ?? `#${Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0')}`;
+}
+
+export default function ProductBadge({ colors, selectedColor, onSelectColor, compact }: Props) {
+  const isSelectable = typeof onSelectColor === 'function';
+  const sw = compact ? '1.125rem' : '2rem';
+  const gap = compact ? '0.35rem' : undefined;
+  return (
+    <div
+      className={`d-flex flex-wrap align-items-center ${compact ? 'opal-product-badge--compact' : 'gap-2'}`}
+      style={gap ? { gap } : undefined}
+    >
+      {colors.map((color) => {
+        const selected = selectedColor != null && selectedColor.trim().toLowerCase() === color.trim().toLowerCase();
+        return (
+          <span
+            key={color}
+            role={isSelectable ? 'button' : undefined}
+            tabIndex={isSelectable ? 0 : undefined}
+            className={`product-color-swatch rounded-circle ${selected ? 'selected' : ''}`}
+            style={{
+              backgroundColor: getColorHex(color),
+              width: sw,
+              height: sw,
+              display: 'inline-block',
+              cursor: isSelectable ? 'pointer' : undefined,
+            }}
+            title={color}
+            aria-label={color}
+            aria-pressed={isSelectable ? selected : undefined}
+            onClick={isSelectable ? () => onSelectColor(color) : undefined}
+            onKeyDown={isSelectable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelectColor(color); } } : undefined}
+          />
+        );
+      })}
+      <style>{`
+        .product-color-swatch {
+          border: 2px solid rgba(0,0,0,0.15);
+          transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+        }
+        .opal-product-badge--compact .product-color-swatch {
+          border-width: 1.5px;
+        }
+        .product-color-swatch:hover { transform: scale(1.08); }
+        .product-color-swatch.selected {
+          border-color: #212529;
+          box-shadow: 0 0 0 2px #fff, 0 0 0 4px #212529;
+        }
+      `}</style>
+    </div>
+  );
+}
+

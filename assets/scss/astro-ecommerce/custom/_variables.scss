@@ -1,0 +1,17 @@
+// OPAL — fashion × tech: override Creative Tim defaults (loaded before theme _variables)
+
+$font-family-sans-serif:
+  var(--font-plus-jakarta),
+  "Plus Jakarta Sans",
+  system-ui,
+  -apple-system,
+  "Segoe UI",
+  Roboto,
+  "Helvetica Neue",
+  sans-serif;
+
+$headings-font-family: var(--font-syne), "Syne", "Plus Jakarta Sans", system-ui, sans-serif;
+$headings-font-weight: 500;
+
+// Primary — deep ink-violet (restrained, works on light editorial surfaces)
+$primary: #3730a3;
